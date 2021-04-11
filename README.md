@@ -15,11 +15,12 @@ windows 下 vscode 配置 OpenGL 开发环境
 
     > 选择**Windows pre-compiled binaries**，因为我们使用的 MinGW 所以选择 [32-bit Windows binaries](https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN32.zip)
 
--   glad 生成静态库
+-   glad [在线服务](https://glad.dav1d.de/) 生成静态库
     ```
     gcc ./src/glad.c -c -I ./include/
     ar -rc libglad.a glad.o
     ```
+    > 将生成的 libglad.a 复制到 lib 文件下
 -   glm 复制到 include 目录下
 
 -   imgui 复制到 include 目下,Makefile 中添加以下命令
