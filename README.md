@@ -17,8 +17,8 @@ windows 下 vscode 配置 OpenGL 开发环境
 
 -   glad [在线服务](https://glad.dav1d.de/) 生成静态库
     ```
-    gcc ./src/glad.c -c -I ./include/
-    ar -rc libglad.a glad.o
+    > gcc ./src/glad.c -c -I ./include/
+    > ar -rc libglad.a glad.o
     ```
     > 将生成的 libglad.a 复制到 lib 文件下
 -   glm 复制到 include 目录下
