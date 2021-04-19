@@ -5,7 +5,7 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
-string Shader::dirName;
+std::string Shader::dirName;
 int main(int argc, char *argv[])
 {
   Shader::dirName = argv[1];

@@ -10,22 +10,20 @@
 #include <sstream>
 #include <iostream>
 
-using namespace std;
-
 class Shader
 {
 public:
     unsigned int ID;
-    static string dirName;
+    static std::string dirName;
 
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath = nullptr)
     {
 
-        string vert_string = vertexPath;
-        string frag_string = fragmentPath;
-        string gemo_string = "";
+        std::string vert_string = vertexPath;
+        std::string frag_string = fragmentPath;
+        std::string gemo_string = "";
 
         const char *vert_char = vert_string.insert(2, dirName).c_str();
         const char *frag_char = frag_string.insert(2, dirName).c_str();
@@ -34,7 +32,7 @@ public:
         if (geometryPath != nullptr)
         {
             gemo_string = vertexPath;
-            gemo_char = gemo_string.insert(2, geometryPath).c_str();
+            gemo_char = gemo_string.insert(2, dirName).c_str();
         }
 
         // 1. retrieve the vertex/fragment source code from filePath
