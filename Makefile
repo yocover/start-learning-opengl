@@ -88,6 +88,7 @@ clean:
 	$(RM) $(OUTPUTMAIN)
 	$(RM) $(call FIXPATH,$(OBJECTS))
 	@echo Cleanup complete!
+# 此处./src/$(dir) 传递main函数 argv 的参数
 run: all
-	./$(OUTPUTMAIN)
+	./$(OUTPUTMAIN) ./src/$(dir) 
 	@echo Executing 'run: all' complete!

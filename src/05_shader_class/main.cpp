@@ -5,9 +5,13 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
+string Shader::dirName = "aaa";
 
-int main()
+int main(int argc, char *argv[])
 {
+
+  Shader::dirName = argv[1];
+
   glfwInit();
   // 设置主要和次要版本
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -36,7 +40,9 @@ int main()
   // 注册窗口变化监听
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  Shader ourShader("./src/05_shader_calss/shader/vertex.glsl", "./src/05_shader_calss/shader/fragment.glsl");
+  Shader ourShader("./src/05_shader_class/shader/vertex.glsl", "./src/05_shader_class/shader/fragment.glsl");
+
+  std::cout << "dir name: " << argv[1] << std::endl;
 
   // 定义顶点数组
   float vertices[] = {

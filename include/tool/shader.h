@@ -10,14 +10,20 @@
 #include <sstream>
 #include <iostream>
 
+using namespace std;
+
 class Shader
 {
 public:
     unsigned int ID;
+
+    static string dirName;
+
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath = nullptr)
     {
+
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -100,6 +106,9 @@ public:
     // ------------------------------------------------------------------------
     void use()
     {
+        // cout << "---------------------" << endl;
+        cout << "dir name == " + dirName << endl;
+        // cout << "---------------------" << endl;
         glUseProgram(ID);
     }
     // utility uniform functions
