@@ -16,13 +16,26 @@ class Shader
 {
 public:
     unsigned int ID;
-
     static string dirName;
 
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char *vertexPath, const char *fragmentPath, const char *geometryPath = nullptr)
     {
+
+        string vert_string = vertexPath;
+        string frag_string = fragmentPath;
+        string gemo_string = "";
+
+        const char *vert_char = vert_string.insert(2, dirName).c_str();
+        const char *frag_char = frag_string.insert(2, dirName).c_str();
+        const char *gemo_char;
+
+        if (geometryPath != nullptr)
+        {
+            gemo_string = vertexPath;
+            gemo_char = gemo_string.insert(2, geometryPath).c_str();
+        }
 
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -38,8 +51,8 @@ public:
         try
         {
             // open files
-            vShaderFile.open(vertexPath);
-            fShaderFile.open(fragmentPath);
+            vShaderFile.open(vert_char);
+            fShaderFile.open(frag_char);
             std::stringstream vShaderStream, fShaderStream;
             // read file's buffer contents into streams
             vShaderStream << vShaderFile.rdbuf();
@@ -53,7 +66,7 @@ public:
             // if geometry shader path is present, also load a geometry shader
             if (geometryPath != nullptr)
             {
-                gShaderFile.open(geometryPath);
+                gShaderFile.open(gemo_char);
                 std::stringstream gShaderStream;
                 gShaderStream << gShaderFile.rdbuf();
                 gShaderFile.close();
@@ -106,9 +119,6 @@ public:
     // ------------------------------------------------------------------------
     void use()
     {
-        // cout << "---------------------" << endl;
-        cout << "dir name == " + dirName << endl;
-        // cout << "---------------------" << endl;
         glUseProgram(ID);
     }
     // utility uniform functions

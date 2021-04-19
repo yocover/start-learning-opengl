@@ -19,6 +19,7 @@ OUTPUT	:= output
 
 # define source directory 运行时修改此处路径
 SRC		:= src/$(dir) #// 传递 var 变量定义执行文件目录
+CLEAN_SRC		:= src\$(dir)\*.o #// 删除所有.o文件
 
 # define include directory
 INCLUDE	:= include
@@ -65,7 +66,7 @@ OBJECTS		:= $(SOURCES:.cpp=.o)
 # deleting dependencies appended to the file from 'make depend'
 #
 
-OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)/$(MAIN))
+OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)\$(MAIN))
 
 all: $(OUTPUT) $(MAIN)
 	@echo Executing 'all' complete!
@@ -86,9 +87,9 @@ $(MAIN): $(OBJECTS)
 .PHONY: clean
 clean:
 	$(RM) $(OUTPUTMAIN)
-	$(RM) $(call FIXPATH,$(OBJECTS))
+	$(RM) $(call FIXPATH,$(CLEAN_SRC))
 	@echo Cleanup complete!
 # 此处./src/$(dir) 传递main函数 argv 的参数
 run: all
-	./$(OUTPUTMAIN) ./src/$(dir) 
+	.\$(OUTPUTMAIN) src/$(dir)/
 	@echo Executing 'run: all' complete!

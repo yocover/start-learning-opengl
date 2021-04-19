@@ -5,13 +5,10 @@
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
-string Shader::dirName = "aaa";
-
+string Shader::dirName;
 int main(int argc, char *argv[])
 {
-
   Shader::dirName = argv[1];
-
   glfwInit();
   // 设置主要和次要版本
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -40,9 +37,7 @@ int main(int argc, char *argv[])
   // 注册窗口变化监听
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  Shader ourShader("./src/05_shader_class/shader/vertex.glsl", "./src/05_shader_class/shader/fragment.glsl");
-
-  std::cout << "dir name: " << argv[1] << std::endl;
+  Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
   // 定义顶点数组
   float vertices[] = {
@@ -89,7 +84,7 @@ int main(int argc, char *argv[])
     ourShader.use();
     glBindVertexArray(VAO); // 不需要每次都绑定，对于当前程序其实只需要绑定一次就可以了
     // glDrawArrays(GL_POINTS, 0, 6);
-    glDrawArrays(GL_LINE_LOOP, 0, 3);
+    // glDrawArrays(GL_LINE_LOOP, 0, 3);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glBindVertexArray(0);
