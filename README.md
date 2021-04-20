@@ -56,6 +56,7 @@ windows 下 vscode 配置 OpenGL 开发环境
 
     # define source directory 运行时修改此处路径
     SRC		:= src/$(dir) #// 传递 var 变量定义执行文件目录
+    CLEAN_SRC		:= src\$(dir)\*.o #// 删除所有.o文件
 
     # define include directory
     INCLUDE	:= include
@@ -102,7 +103,7 @@ windows 下 vscode 配置 OpenGL 开发环境
     # deleting dependencies appended to the file from 'make depend'
     #
 
-    OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)/$(MAIN))
+    OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)\$(MAIN))
 
     all: $(OUTPUT) $(MAIN)
       @echo Executing 'all' complete!
@@ -123,16 +124,17 @@ windows 下 vscode 配置 OpenGL 开发环境
     .PHONY: clean
     clean:
       $(RM) $(OUTPUTMAIN)
-      $(RM) $(call FIXPATH,$(OBJECTS))
+      $(RM) $(call FIXPATH,$(CLEAN_SRC))
       @echo Cleanup complete!
+    # 此处./src/$(dir) 传递main函数 argv 的参数
     run: all
-      ./$(OUTPUTMAIN)
+      .\$(OUTPUTMAIN) src/$(dir)/
       @echo Executing 'run: all' complete!
     ```
 
 ## 示例
 
-### 1. Run
+### 1. Run 和 Clean
 
 **测试代码**
 
@@ -194,10 +196,16 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 ```
 
-**执行命令**
+**执行命令 run 编译和运行.exe 程序**
 
 ```Bash
 make run dir=01_test_glfw
+```
+
+**执行命令 clean 删除 .exe 和对应文件夹下的.o 文件**
+
+```Bash
+make clean dir=01_test_glfw
 ```
 
 ### 2. Debug
