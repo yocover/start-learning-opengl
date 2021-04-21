@@ -97,6 +97,9 @@ int main(int argc, char *argv[])
   glBindTexture(GL_TEXTURE_2D, texture1);
 
   // 设置环绕和过滤方式
+  float borderColor[] = {0.3f, 0.1f, 0.7f, 1.0f};
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -138,6 +141,8 @@ int main(int argc, char *argv[])
   ourShader.setInt("texture1", 0);
   ourShader.setInt("texture2", 1);
 
+  float factor = 0.0;
+
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
@@ -148,6 +153,9 @@ int main(int argc, char *argv[])
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
+
+    factor = glfwGetTime();
+    ourShader.setFloat("factor", factor);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
