@@ -8,7 +8,7 @@ using namespace std;
 class PlaneGeometry : public BufferGeometry
 {
 public:
-  PlaneGeometry(float width, float height, float wSegment, float hSegment)
+  PlaneGeometry(float width = 1.0, float height = 1.0, float wSegment = 1.0, float hSegment = 1.0)
   {
 
     float width_half = width / 2.0f;

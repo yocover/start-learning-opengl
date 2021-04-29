@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
-  PlaneGeometry planeGeometry(1.0, 1.0, 10.0, 10.0);
+  PlaneGeometry planeGeometry(1.0, 1.0);
 
   // 生成纹理
   unsigned int texture1, texture2;
