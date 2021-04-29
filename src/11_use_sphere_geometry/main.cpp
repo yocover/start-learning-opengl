@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // 加载图片
-  data = stbi_load("./static/texture/awesomeface.png", &width, &height, &nrChannels, 0);
+  data = stbi_load("./static/texture/dot.png", &width, &height, &nrChannels, 0);
 
   if (data)
   {
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 
     glBindVertexArray(sphereGeometry.VAO);
 
-    glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
     glDrawElements(GL_POINTS, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
     glDrawElements(GL_LINE_LOOP, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 

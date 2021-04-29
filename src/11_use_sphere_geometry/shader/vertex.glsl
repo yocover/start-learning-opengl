@@ -49,6 +49,6 @@ void main() {
   gl_Position = rotateXYZ(factor) * vec4(Position, 1.0f);
 
   // gl_Position = vec4(Position, 1.0f);
-  gl_PointSize = 2.0f;
+  gl_PointSize = 10.0f;
   outTexCoord = TexCoords;
 }
