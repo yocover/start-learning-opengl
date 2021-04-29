@@ -12,7 +12,7 @@
                 "command": "powershell",
                 "args": [
                     "-c",
-                    "make dir=07_load_texture" // 调式之前设置目录
+                    "make dir=10_use_plane_geometry" // 调式之前设置目录
                 ]
             },
             "linux": {

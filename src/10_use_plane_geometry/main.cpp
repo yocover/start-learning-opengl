@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tool/shader.h>
+#include <geometry/PlaneGeometry.h>
 
 #include <iostream>
 
@@ -10,6 +11,9 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 std::string Shader::dirName;
+
+const unsigned int SCREEN_WIDTH = 800;
+const unsigned int SCREEN_HEIGHT = 600;
 
 using namespace std;
 
@@ -23,7 +27,7 @@ int main(int argc, char *argv[])
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // 创建窗口对象
-  GLFWwindow *window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
   if (window == NULL)
   {
     std::cout << "Failed to create GLFW window" << std::endl;
@@ -38,7 +42,7 @@ int main(int argc, char *argv[])
     return -1;
   }
   // 设置视口
-  glViewport(0, 0, 800, 600);
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -48,51 +52,7 @@ int main(int argc, char *argv[])
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
-  // 顶点数据
-  float vertices[] = {
-      //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-      0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // 右上
-      0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // 右下
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0, 0.0f, // 左下
-      -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // 左上
-  };
-
-  // 索引数据
-  unsigned int indices[] = {
-      0, 1, 3, // 三角形一
-      1, 2, 3  // 三角形二
-  };
-
-  // 创建缓冲对象
-  unsigned int VBO, EBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-
-  // 绑定VAO缓冲对象
-  glBindVertexArray(VAO);
-
-  // 绑定VBO缓对象
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  // 填充VBO数据
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-  // 设置顶点位置属性指针
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  // 设置顶点颜色属性指针
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
-  // 设置顶点纹理坐标属性指针
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-
-  glBindVertexArray(0);
+  PlaneGeometry planeGeometry(1.0, 1.0, 10.0, 10.0);
 
   // 生成纹理
   unsigned int texture1, texture2;
@@ -160,24 +120,25 @@ int main(int argc, char *argv[])
     factor = glfwGetTime();
     ourShader.setFloat("factor", factor);
 
+    planeGeometry.rotateZ(glm::sin(-10.0f));
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(planeGeometry.VAO);
+
+    glDrawElements(GL_TRIANGLES, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_POINTS, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_LINE_LOOP, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-  glDeleteBuffers(1, &EBO);
-
+  planeGeometry.dispose();
   glfwTerminate();
   return 0;
 }

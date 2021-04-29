@@ -14,11 +14,11 @@ using namespace std;
 
 struct Vertex
 {
-	glm::vec3 Position;	 // ����λ������
-	glm::vec3 Normal;		 // ���㷨����
-	glm::vec2 TexCoords; // ��������
+	glm::vec3 Position;	 // 顶点属性
+	glm::vec3 Normal;		 // 法线
+	glm::vec2 TexCoords; // 纹理坐标
 
-	// ������
+	// 切线空间属性
 	glm::vec3 Tangent;
 	glm::vec3 Bitangent;
 };
