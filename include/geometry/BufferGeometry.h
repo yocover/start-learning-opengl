@@ -66,6 +66,7 @@ public:
     for (unsigned int i = 0; i < vertices.size(); i++)
     {
       vertices[i].Position = matrix * glm::vec4(vertices[i].Position, 1.0f);
+      // vertices[i].TexCoords = matrix * glm::vec4(vertices[i].TexCoords, 0.0f, 1.0f);
     }
   }
 

@@ -1,7 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tool/shader.h>
-#include <geometry/PlaneGeometry.h>
+#include <geometry/sphereGeometry.h>
+#include <geometry/SphereGeometry.h>
 
 #include <iostream>
 
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
-  PlaneGeometry planeGeometry(1.0, 1.0);
+  SphereGeometry sphereGeometry(0.5, 20.0, 20.0);
 
   // 生成纹理
   unsigned int texture1, texture2;
@@ -118,9 +119,9 @@ int main(int argc, char *argv[])
     ourShader.use();
 
     factor = glfwGetTime();
-    ourShader.setFloat("factor", factor);
+    ourShader.setFloat("factor", -factor * 0.3);
 
-    planeGeometry.rotateX(glm::radians(glm::sin(-10.0f)));
+    sphereGeometry.rotateXYZ(glm::radians(glm::sin(factor)));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -128,17 +129,17 @@ int main(int argc, char *argv[])
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    glBindVertexArray(planeGeometry.VAO);
+    glBindVertexArray(sphereGeometry.VAO);
 
-    glDrawElements(GL_TRIANGLES, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // glDrawElements(GL_POINTS, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // glDrawElements(GL_LINE_LOOP, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_POINTS, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINE_LOOP, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  planeGeometry.dispose();
+  sphereGeometry.dispose();
   glfwTerminate();
   return 0;
 }
