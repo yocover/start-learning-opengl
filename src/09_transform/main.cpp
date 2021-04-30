@@ -2,6 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <tool/shader.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -146,6 +150,16 @@ int main(int argc, char *argv[])
 
   float factor = 0.0;
 
+  // 初始化一个单位矩阵
+  glm::mat4 trans = glm::mat4(1.0f);
+
+  trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+  trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+  // 将矩阵传递给顶点着色器
+  unsigned int transform = glGetUniformLocation(ourShader.ID, "transform");
+  glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
+
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
@@ -158,7 +172,13 @@ int main(int argc, char *argv[])
     ourShader.use();
 
     factor = glfwGetTime();
-    ourShader.setFloat("factor", factor);
+    ourShader.setFloat("factor", -factor);
+
+    trans = glm::rotate(trans, glm::radians(factor * 10.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+    glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
+    trans = glm::mat4(1.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
