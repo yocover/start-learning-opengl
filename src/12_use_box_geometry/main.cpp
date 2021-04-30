@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
   BoxGeometry boxGeometry(0.2, 1.5, 0.2, 1.0, 100.0, 1.0);
+  // BoxGeometry boxGeometry(1.0, 0.1, 0.1, 1.0, 1.0, 1.0);
 
   // 生成纹理
   unsigned int texture1, texture2;
