@@ -7,3 +7,4 @@
 -   什么是 Mipmap 它是为了解决什么问题
 -   如何将纹理映射到三角面上，纹理坐标，纹理单元，映射的过程 texture(sampler2D, texCoord)
 -   glsl 中 mix 函数的作用 mix(x, y, a); a(0, 1)
+
