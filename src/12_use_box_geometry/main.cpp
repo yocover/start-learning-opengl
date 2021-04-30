@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tool/shader.h>
-#include <geometry/PlaneGeometry.h>
+#include <geometry/BoxGeometry.h>
 
 #include <iostream>
 
@@ -47,12 +47,15 @@ int main(int argc, char *argv[])
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // glEnable(GL_DEPTH_TEST);
+  // glDepthFunc(GL_LESS);
+
   // 注册窗口变化监听
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
-  PlaneGeometry planeGeometry(1.0, 1.0, 8, 8);
+  BoxGeometry boxGeometry(0.2, 1.5, 0.2, 1.0, 100.0, 1.0);
 
   // 生成纹理
   unsigned int texture1, texture2;
@@ -92,7 +95,7 @@ int main(int argc, char *argv[])
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // 加载图片
-  data = stbi_load("./static/texture/awesomeface.png", &width, &height, &nrChannels, 0);
+  data = stbi_load("./static/texture/dot.png", &width, &height, &nrChannels, 0);
 
   if (data)
   {
@@ -112,15 +115,15 @@ int main(int argc, char *argv[])
 
     // 渲染指令
     // ...
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    // glClearColor(0.14f, 0.14f, 0.14f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ourShader.use();
 
     factor = glfwGetTime();
-    ourShader.setFloat("factor", factor);
+    ourShader.setFloat("factor", -factor * 0.3);
 
-    // planeGeometry.rotateX(glm::radians(glm::sin(-10.0f)));
+    // boxGeometry.rotateXYZ(glm::radians(glm::sin(factor)));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -128,17 +131,17 @@ int main(int argc, char *argv[])
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    glBindVertexArray(planeGeometry.VAO);
+    glBindVertexArray(boxGeometry.VAO);
 
-    // glDrawElements(GL_TRIANGLES, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    glDrawElements(GL_POINTS, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    glDrawElements(GL_LINE_LOOP, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_POINTS, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINE_LOOP, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  planeGeometry.dispose();
+  boxGeometry.dispose();
   glfwTerminate();
   return 0;
 }
