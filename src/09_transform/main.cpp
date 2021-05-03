@@ -174,7 +174,8 @@ int main(int argc, char *argv[])
     factor = glfwGetTime();
     ourShader.setFloat("factor", -factor);
 
-    trans = glm::rotate(trans, glm::radians(factor * 10.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::translate(trans, glm::vec3(-0.5, 0.0, 0.0));
+    trans = glm::rotate(trans, glm::radians(factor * 30.0f), glm::vec3(0.0, 0.0, 1.0));
     trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 
     glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
@@ -187,6 +188,13 @@ int main(int argc, char *argv[])
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
+
+    trans = glm::translate(trans, glm::vec3(0.5, 0.0, 0.0));
+    trans = glm::scale(trans, glm::vec3(sin(factor * 1.0f) * 0.5, sin(factor * 1.0f) * 0.5, 0.5));
+    glUniformMatrix4fv(transform, 1, GL_FALSE, glm::value_ptr(trans));
+    trans = glm::mat4(1.0f);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
 
