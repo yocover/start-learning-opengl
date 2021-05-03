@@ -120,8 +120,6 @@ int main(int argc, char *argv[])
     factor = glfwGetTime();
     ourShader.setFloat("factor", factor);
 
-    // planeGeometry.rotateX(glm::radians(glm::sin(-10.0f)));
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 

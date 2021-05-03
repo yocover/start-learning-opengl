@@ -12,7 +12,7 @@
                 "command": "powershell",
                 "args": [
                     "-c",
-                    "make dir=12_use_box_geometry" // 调式之前设置目录
+                    "make dir=13_use_add_boxs" // 调式之前设置目录
                 ]
             },
             "linux": {

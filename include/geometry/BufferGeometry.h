@@ -16,59 +16,12 @@ struct Vertex
   glm::vec2 TexCoords; // 纹理坐标
 };
 
-glm::mat4 _m1 = glm::mat4(1.0f);
-
 class BufferGeometry
 {
 public:
   vector<Vertex> vertices;
   vector<unsigned int> indices;
   unsigned int VAO;
-
-  void rotateX(float angle)
-  {
-    _m1 = glm::rotate(_m1, glm::radians(angle), glm::vec3(1.0, 0.0, 0.0));
-    this->applyMatrix(_m1);
-
-    this->updateBufferData();
-    _m1 = glm::mat4(1.0f);
-  }
-
-  void rotateY(float angle)
-  {
-    _m1 = glm::rotate(_m1, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-    this->applyMatrix(_m1);
-
-    this->updateBufferData();
-    _m1 = glm::mat4(1.0f);
-  }
-
-  void rotateZ(float angle)
-  {
-    _m1 = glm::rotate(_m1, glm::radians(angle), glm::vec3(0.0, 0.0, 1.0));
-    this->applyMatrix(_m1);
-
-    this->updateBufferData();
-    _m1 = glm::mat4(1.0f);
-  }
-
-  void rotateXYZ(float angle)
-  {
-    _m1 = glm::rotate(_m1, glm::radians(angle), glm::vec3(1.0, 1.0, 1.0));
-    this->applyMatrix(_m1);
-
-    this->updateBufferData();
-    _m1 = glm::mat4(1.0f);
-  }
-
-  void applyMatrix(glm::mat4 matrix)
-  {
-    for (unsigned int i = 0; i < vertices.size(); i++)
-    {
-      vertices[i].Position = matrix * glm::vec4(vertices[i].Position, 1.0f);
-      // vertices[i].TexCoords = matrix * glm::vec4(vertices[i].TexCoords, 0.0f, 1.0f);
-    }
-  }
 
   void logParameters()
   {
@@ -91,15 +44,11 @@ public:
     glDeleteBuffers(1, &EBO);
   }
 
+private:
+  glm::mat4 matrix = glm::mat4(1.0f);
+
 protected:
   unsigned int VBO, EBO;
-
-  void updateBufferData()
-  {
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vertices[0]), &vertices[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  }
 
   void setupBuffers()
   {
