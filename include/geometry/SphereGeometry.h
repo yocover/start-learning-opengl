@@ -5,8 +5,6 @@
 
 using namespace std;
 
-const float PI = glm::pi<float>();
-
 class SphereGeometry : public BufferGeometry
 {
 public:

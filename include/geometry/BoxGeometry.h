@@ -1,11 +1,9 @@
-#ifndef SPHERE_GROMETRY
-#define SPHERE_GROMETRY
+#ifndef BOX_GROMETRY
+#define BOX_GROMETRY
 
 #include <geometry/BufferGeometry.h>
 
 using namespace std;
-
-const float PI = glm::pi<float>();
 
 class BoxGeometry : public BufferGeometry
 {
@@ -15,7 +13,7 @@ public:
   float widthSegments;
   float heightSegments;
   float depthSegments;
-  BoxGeometry(float width = 1.0f, float height = 1.0f, float depth = 1, float widthSegments = 1.0f, float heightSegments = 1.0f, float depthSegments = 1.0f)
+  BoxGeometry(float width = 1.0f, float height = 1.0f, float depth = 1.0, float widthSegments = 1.0f, float heightSegments = 1.0f, float depthSegments = 1.0f)
   {
 
     widthSegments = glm::floor(widthSegments);
