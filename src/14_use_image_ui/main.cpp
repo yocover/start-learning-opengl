@@ -10,6 +10,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <tool/stb_image.h>
 
+#include <tool/gui.h>
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
 std::string Shader::dirName;
@@ -24,6 +26,7 @@ int main(int argc, char *argv[])
   Shader::dirName = argv[1];
   glfwInit();
   // 设置主要和次要版本
+  const char *glsl_version = "#version 330";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -43,6 +46,20 @@ int main(int argc, char *argv[])
     std::cout << "Failed to initialize GLAD" << std::endl;
     return -1;
   }
+
+  // -----------------------
+  // 创建imgui上下文
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  (void)io;
+  // 设置样式
+  ImGui::StyleColorsDark();
+  // 设置平台和渲染器
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init(glsl_version);
+
+  // -----------------------
+
   // 设置视口
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glEnable(GL_PROGRAM_POINT_SIZE);
@@ -125,13 +142,27 @@ int main(int argc, char *argv[])
       glm::vec3(1.5f, 0.2f, -1.5f),
       glm::vec3(-1.3f, 1.0f, -1.5f)};
 
+  float f = 0.0f;
+  ImVec4 clear_color = ImVec4(0.21, 0.3, 0.21, 1.0);
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
 
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("imgui");
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+    ImGui::ColorEdit3("clear color", (float *)&clear_color);
+    ImGui::End();
+
+    cout << "f = " << f << endl;
+
     // 渲染指令
     // ...
-    // glClearColor(0.14f, 0.14f, 0.14f, 1.0f);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ourShader.use();
@@ -183,6 +214,10 @@ int main(int argc, char *argv[])
     glBindVertexArray(sphereGeometry.VAO);
     glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
+    // 渲染 gui
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -191,6 +226,7 @@ int main(int argc, char *argv[])
   planeGeometry.dispose();
   sphereGeometry.dispose();
   glfwTerminate();
+
   return 0;
 }
 
