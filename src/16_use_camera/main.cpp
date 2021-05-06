@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 
   float fov = 45.0f; // 视锥体的角度
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
-  ImVec4 clear_color = ImVec4(0.21, 0.3, 0.21, 1.0);
+  ImVec4 clear_color = ImVec4(0.2, 0.3, 0.3, 1.0);
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
@@ -161,17 +161,15 @@ int main(int argc, char *argv[])
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("imgui");
+    ImGui::Begin("controls");
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderFloat("fov", &fov, 0.0f, 360.0f);
-    ImGui::SliderInt("SCREEN_WIDTH", &SCREEN_WIDTH, 1, 1980);
-    ImGui::SliderInt("SCREEN_HEIGHT", &SCREEN_HEIGHT, 1, 1080);
 
     ImGui::SliderFloat("x", &view_translate.x, -10.0, 10.0);
     ImGui::SliderFloat("y", &view_translate.y, -10.0, 10.0);
     ImGui::SliderFloat("z", &view_translate.z, -10.0, 10.0);
 
-    ImGui::ColorEdit3("clear color", (float *)&clear_color);
+    ImGui::ColorEdit3("clearColor", (float *)&clear_color);
     ImGui::End();
 
     // 渲染指令
@@ -208,7 +206,7 @@ int main(int argc, char *argv[])
       {
         model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1.0, 1.0, 1.0));
       }
-      model = glm::scale(model, glm::vec3(0.3, 0.3, 0.3));
+      model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
       float angle = 20.f * i;
       model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       ourShader.setMat4("model", model);
@@ -269,18 +267,17 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 void mouse_button_calback(GLFWwindow *window, int button, int action, int mods)
 {
 
-  cout << mods << endl;
   if (action == GLFW_PRESS)
     switch (button)
     {
     case GLFW_MOUSE_BUTTON_LEFT:
-      cout << "mouse left" << endl;
+      // cout << "mouse left" << endl;
       break;
     case GLFW_MOUSE_BUTTON_MIDDLE:
-      cout << "mouse middle" << endl;
+      // cout << "mouse middle" << endl;
       break;
     case GLFW_MOUSE_BUTTON_RIGHT:
-      cout << "mouse right" << endl;
+      // cout << "mouse right" << endl;
       break;
     }
 }
@@ -290,14 +287,14 @@ void cursor_position_callback(GLFWwindow *window, double x, double y)
   float xpos = float((x - SCREEN_WIDTH / 2) / SCREEN_WIDTH) * 2;
   float ypos = float(0 - (y - SCREEN_HEIGHT / 2) / SCREEN_HEIGHT) * 2;
 
-  cout << "xpos " << xpos << endl;
-  cout << "ypos " << ypos << endl;
+  // cout << "xpos " << xpos << endl;
+  // cout << "ypos " << ypos << endl;
   return;
 }
 
 void scroll_callback(GLFWwindow *window, double x, double y)
 {
-  cout << "x " << x << endl;
-  cout << "y " << y << endl;
+  // cout << "x " << x << endl;
+  // cout << "y " << y << endl;
   return;
 }
