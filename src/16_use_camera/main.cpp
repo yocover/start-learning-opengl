@@ -22,6 +22,15 @@ std::string Shader::dirName;
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
 
+// camera value
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// delta time
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -153,9 +162,14 @@ int main(int argc, char *argv[])
   float fov = 45.0f; // 视锥体的角度
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
   ImVec4 clear_color = ImVec4(0.2, 0.3, 0.3, 1.0);
+
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
+
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastTime;
+    lastTime = currentFrame;
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -163,13 +177,6 @@ int main(int argc, char *argv[])
 
     ImGui::Begin("controls");
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderFloat("fov", &fov, 0.0f, 360.0f);
-
-    ImGui::SliderFloat("x", &view_translate.x, -10.0, 10.0);
-    ImGui::SliderFloat("y", &view_translate.y, -10.0, 10.0);
-    ImGui::SliderFloat("z", &view_translate.z, -10.0, 10.0);
-
-    ImGui::ColorEdit3("clearColor", (float *)&clear_color);
     ImGui::End();
 
     // 渲染指令
@@ -188,8 +195,12 @@ int main(int argc, char *argv[])
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    float radius = 10.0f;
+    float camX = sin(glfwGetTime()) * radius;
+    float camZ = cos(glfwGetTime()) * radius;
+
     glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, view_translate);
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(fov), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
@@ -255,6 +266,25 @@ void processInput(GLFWwindow *window)
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
   {
     glfwSetWindowShouldClose(window, true);
+  }
+
+  // 相机按键控制
+  float cameraSpeed = 2.5f * deltaTime;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+  {
+    cameraPos += cameraSpeed * cameraFront;
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+  {
+    cameraPos -= cameraSpeed * cameraFront;
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+  {
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+  {
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
   }
 }
 
