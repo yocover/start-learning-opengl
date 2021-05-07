@@ -39,6 +39,9 @@ int main(int argc, char *argv[])
   glfwInit();
   // 设置主要和次要版本
   const char *glsl_version = "#version 330";
+
+  // 片段着色器将作用域每一个采样点（采用4倍抗锯齿，则每个像素有4个片段（四个采样点））
+  // glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -147,17 +150,12 @@ int main(int argc, char *argv[])
 
   float factor = 0.0;
 
-  glm::vec3 cubePositions[] = {
-      glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(2.0f, 5.0f, -15.0f),
-      glm::vec3(-1.5f, -2.2f, -2.5f),
-      glm::vec3(-3.8f, -2.0f, -12.3f),
-      glm::vec3(2.4f, -0.4f, -3.5f),
-      glm::vec3(-1.7f, 3.0f, -7.5f),
-      glm::vec3(1.3f, -2.0f, -2.5f),
-      glm::vec3(1.5f, 2.0f, -2.5f),
-      glm::vec3(1.5f, 0.2f, -1.5f),
-      glm::vec3(-1.3f, 1.0f, -1.5f)};
+  // 旋转矩阵
+  glm::mat4 ex = glm::eulerAngleX(45.0f);
+  glm::mat4 ey = glm::eulerAngleY(45.0f);
+  glm::mat4 ez = glm::eulerAngleZ(45.0f);
+
+  glm::mat4 qularXYZ = glm::eulerAngleXYZ(45.0f, 45.0f, 45.0f);
 
   float fov = 45.0f; // 视锥体的角度
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
@@ -203,42 +201,18 @@ int main(int argc, char *argv[])
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(fov), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    // model = glm::eulerAngleZ(glfwGetTime()) * glm::eulerAngleY(glfwGetTime()) * glm::eulerAngleX(glfwGetTime());
+
+    glm::qua<float> qu = glm::qua<float>(glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime()));
+    model = glm::mat4_cast(qu);
 
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
+    ourShader.setMat4("model", model);
     glBindVertexArray(boxGeometry.VAO);
-
-    for (unsigned int i = 0; i < 10; i++)
-    {
-      glm::mat4 model = glm::mat4(1.0f);
-      model = glm::translate(model, cubePositions[i]);
-      if (i % 3 == 0)
-      {
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1.0, 1.0, 1.0));
-      }
-      model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-      float angle = 20.f * i;
-      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-      ourShader.setMat4("model", model);
-      glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    }
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.0, 0.0, 0.0));
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.0f), glm::vec3(1.0, 0.0, 0.0));
-    ourShader.setMat4("model", model);
-
-    glBindVertexArray(planeGeometry.VAO);
-    glDrawElements(GL_TRIANGLES, planeGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(1.0, 0.0, 0.0));
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.0f), glm::vec3(1.0, 0.5, 0.5));
-    ourShader.setMat4("model", model);
-
-    glBindVertexArray(sphereGeometry.VAO);
-    glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     // 渲染 gui
     ImGui::Render();
