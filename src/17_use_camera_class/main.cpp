@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <tool/shader.h>
+#include <tool/camera.h>
 #include <geometry/BoxGeometry.h>
 #include <geometry/PlaneGeometry.h>
 #include <geometry/SphereGeometry.h>
@@ -30,6 +31,11 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 // delta time
 float deltaTime = 0.0f;
 float lastTime = 0.0f;
+
+float lastX = SCREEN_WIDTH / 2.0f; // 鼠标上一帧的位置
+float lastY = SCREEN_HEIGHT / 2.0f;
+
+Camera camera(glm::vec3(0.0, 1.0, 5.0));
 
 using namespace std;
 
@@ -161,7 +167,6 @@ int main(int argc, char *argv[])
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
   ImVec4 clear_color = ImVec4(0.2, 0.3, 0.3, 1.0);
 
-  float radius = 10.0f;
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
@@ -194,14 +199,11 @@ int main(int argc, char *argv[])
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    float radius = 5.0f;
+    float radius = 10.0f;
     float camX = sin(glfwGetTime()) * radius;
     float camZ = cos(glfwGetTime()) * radius;
 
-    glm::mat4 view = glm::mat4(1.0f);
-
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
+    glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(fov), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
@@ -233,11 +235,13 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+// 窗口变动监听
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
   glViewport(0, 0, width, height);
 }
 
+// 键盘输入监听
 void processInput(GLFWwindow *window)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -246,30 +250,36 @@ void processInput(GLFWwindow *window)
   }
 
   // 相机按键控制
-  float cameraSpeed = 2.5f * deltaTime;
+  // 相机移动
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
   {
-    cameraPos += cameraSpeed * cameraFront;
+    camera.ProcessKeyboard(FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
   {
-    cameraPos -= cameraSpeed * cameraFront;
+    camera.ProcessKeyboard(BACKWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
   {
-    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    camera.ProcessKeyboard(LEFT, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
   {
-    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    camera.ProcessKeyboard(RIGHT, deltaTime);
   }
 }
 
 // 鼠标移动监听
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
-  // cout << "xpos " << xpos << endl;
-  // cout << "ypos " << ypos << endl;
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
+
+  lastX = xpos;
+  lastY = ypos;
+
+  camera.ProcessMouseMovement(xoffset, yoffset);
 }
 void mouse_button_calback(GLFWwindow *window, int button, int action, int mods)
 {
