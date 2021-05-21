@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
     glm::mat4 model = glm::mat4(1.0f);
     // model = glm::eulerAngleZ(glfwGetTime()) * glm::eulerAngleY(glfwGetTime()) * glm::eulerAngleX(glfwGetTime());
 
-    glm::qua<float> qu = glm::qua<float>(glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime()));
-    model = glm::mat4_cast(qu);
+    // glm::qua<float> qu = glm::qua<float>(glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime()));
+    // model = glm::mat4_cast(qu);
 
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
