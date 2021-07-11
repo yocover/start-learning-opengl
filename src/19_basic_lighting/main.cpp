@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
   Shader lightObjectShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
 
   PlaneGeometry planeGeometry(1.0, 1.0, 1.0, 1.0);
-  BoxGeometry boxGeometry(1.0, 1.0, 1.0);
+  SphereGeometry boxGeometry(1.0, 100.0, 100.0);
   SphereGeometry sphereGeometry(0.1, 10.0, 10.0);
 
   // 生成纹理
@@ -170,8 +170,11 @@ int main(int argc, char *argv[])
 
   // 光照信息
 
-  glm::vec3 lightPosition = glm::vec3(1.0, 1.5, 0.0); // 光照位置
-  ourShader.setVec3("lightColor", glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::vec3 lightPosition = glm::vec3(1.2f, 1.0f, 2.0f); // 光照位置
+  ourShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+  ourShader.setVec3("lightPosition", lightPosition);
+  ourShader.setFloat("ambientStrength", 0.01f);
+  ourShader.setVec3("viewPosition", camera.Position);
 
   while (!glfwWindowShouldClose(window))
   {
@@ -217,7 +220,9 @@ int main(int argc, char *argv[])
     float rotate = glfwGetTime() * 0.2f;
 
     glm::qua<float> qu = glm::qua<float>(glm::vec3(rotate, rotate, rotate));
-    model = glm::mat4_cast(qu);
+    // model = glm::mat4_cast(qu);
+
+    ourShader.setFloat("iTime", glfwGetTime());
 
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
@@ -230,6 +235,8 @@ int main(int argc, char *argv[])
     lightObjectShader.use();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(lightPosition.x * glm::sin(glfwGetTime()), lightPosition.y, lightPosition.z));
+
+    // model = glm::translate(model, glm::vec3(lightPosition.x, lightPosition.y, lightPosition.z));
     lightObjectShader.setMat4("model", model);
     lightObjectShader.setMat4("view", view);
     lightObjectShader.setMat4("projection", projection);
