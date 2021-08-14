@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
   // 光照信息
 
   glm::vec3 lightPosition = glm::vec3(1.0, 1.5, 0.0); // 光照位置
-  ourShader.setVec3("lightColor", glm::vec3(0.0f, 1.0f, 0.0f));
+  ourShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
   ourShader.setFloat("ambientStrength", 0.1);
 
   while (!glfwWindowShouldClose(window))
@@ -220,17 +220,24 @@ int main(int argc, char *argv[])
     glm::qua<float> qu = glm::qua<float>(glm::vec3(rotate, rotate, rotate));
     model = glm::mat4_cast(qu);
 
+    glm::vec3 lightPos = glm::vec3(lightPosition.x * glm::sin(glfwGetTime()), lightPosition.y, lightPosition.z);
+
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
     ourShader.setMat4("model", model);
+
+    ourShader.setVec3("lightPos", lightPos);
+    ourShader.setVec3("viewPos", camera.Position);
     glBindVertexArray(boxGeometry.VAO);
     glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     // 绘制灯光物体
     lightObjectShader.use();
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(lightPosition.x * glm::sin(glfwGetTime()), lightPosition.y, lightPosition.z));
+
+    model = glm::translate(model, lightPos);
+
     lightObjectShader.setMat4("model", model);
     lightObjectShader.setMat4("view", view);
     lightObjectShader.setMat4("projection", projection);
