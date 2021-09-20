@@ -182,6 +182,12 @@ int main(int argc, char *argv[])
     deltaTime = currentFrame - lastTime;
     lastTime = currentFrame;
 
+    // 在标题中显示帧率信息
+    std::string FPS = std::to_string(ImGui::GetIO().Framerate);
+    std::string ms = std::to_string(1000.0f / ImGui::GetIO().Framerate);
+    std::string newTitle = "LearnOpenGL - " + ms + " ms/frame " + FPS;
+    glfwSetWindowTitle(window, newTitle.c_str());
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
