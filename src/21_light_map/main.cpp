@@ -17,6 +17,8 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
+unsigned int loadTexture(char const *path);
+
 std::string Shader::dirName;
 
 int SCREEN_WIDTH = 800;
@@ -104,55 +106,9 @@ int main(int argc, char *argv[])
   BoxGeometry boxGeometry(1.0, 1.0, 1.0);
   SphereGeometry sphereGeometry(0.1, 10.0, 10.0);
 
-  // 生成纹理
-  unsigned int texture1, texture2;
-  glGenTextures(1, &texture1);
-  glBindTexture(GL_TEXTURE_2D, texture1);
-
-  // 设置环绕和过滤方式
-  float borderColor[] = {0.3f, 0.1f, 0.7f, 1.0f};
-  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // 图像y轴翻转
-  stbi_set_flip_vertically_on_load(true);
-
-  // 加载图片
-  int width, height, nrChannels;
-  unsigned char *data = stbi_load("./static/texture/container.jpg", &width, &height, &nrChannels, 0);
-
-  if (data)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  stbi_image_free(data);
-
-  glGenTextures(1, &texture2);
-  glBindTexture(GL_TEXTURE_2D, texture2);
-
-  // 设置环绕和过滤方式
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // 加载图片
-  data = stbi_load("./static/texture/awesomeface.png", &width, &height, &nrChannels, 0);
-
-  if (data)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  stbi_image_free(data);
+  unsigned int diffuseMap = loadTexture("./static/texture/container2.png");
   ourShader.use();
-  ourShader.setInt("texture1", 0);
-  ourShader.setInt("texture2", 1);
+  ourShader.setInt("material.diffuse", 0);
 
   float factor = 0.0;
 
@@ -168,14 +124,12 @@ int main(int argc, char *argv[])
   ImVec4 clear_color = ImVec4(25.0 / 255.0, 25.0 / 255.0, 25.0 / 255.0, 1.0); // 25, 25, 25
 
   // 光照信息
-
   glm::vec3 lightPosition = glm::vec3(1.0, 1.5, 0.0); // 光照位置
   ourShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
   ourShader.setFloat("ambientStrength", 0.9);
 
   // 传递材质属性
   ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-  ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
   ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
   ourShader.setFloat("material.shininess", 32.0f);
 
@@ -229,14 +183,8 @@ int main(int argc, char *argv[])
     glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);   // 降低影响
     glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
 
-    ourShader.setVec3("material.ambient", ambientColor);
-    ourShader.setVec3("material.diffuse", diffuseColor);
-
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
 
     float radius = 10.0f;
     float camX = sin(glfwGetTime()) * radius;
@@ -337,4 +285,42 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   lastY = ypos;
 
   camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// 加载纹理贴图
+unsigned int loadTexture(char const *path)
+{
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+
+  int width, height, nrComponents;
+  unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+  if (data)
+  {
+    GLenum format;
+    if (nrComponents == 1)
+      format = GL_RED;
+    else if (nrComponents == 3)
+      format = GL_RGB;
+    else if (nrComponents == 4)
+      format = GL_RGBA;
+
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data);
+  }
+  else
+  {
+    std::cout << "Texture failed to load at path: " << path << std::endl;
+    stbi_image_free(data);
+  }
+
+  return textureID;
 }
