@@ -284,7 +284,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos)
   lastX = xpos;
   lastY = ypos;
 
-  camera.ProcessMouseMovement(xoffset, yoffset);
+  // camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // 加载纹理贴图
