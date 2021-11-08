@@ -16,12 +16,11 @@
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void mouse_button_calback(GLFWwindow *window, int button, int action, int mods);
-void scroll_callback(GLFWwindow *window, double x, double y);
 void processInput(GLFWwindow *window);
 std::string Shader::dirName;
 
-int SCREEN_WIDTH = 1600;
-int SCREEN_HEIGHT = 1200;
+int SCREEN_WIDTH = 800;
+int SCREEN_HEIGHT = 600;
 
 // camera value
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -96,7 +95,6 @@ int main(int argc, char *argv[])
   // 2.鼠标事件
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetMouseButtonCallback(window, mouse_button_calback);
-  glfwSetScrollCallback(window, scroll_callback);
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
   Shader lightObjectShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
@@ -334,10 +332,5 @@ void cursor_position_callback(GLFWwindow *window, double x, double y)
 {
   float xpos = float((x - SCREEN_WIDTH / 2) / SCREEN_WIDTH) * 2;
   float ypos = float(0 - (y - SCREEN_HEIGHT / 2) / SCREEN_HEIGHT) * 2;
-  return;
-}
-
-void scroll_callback(GLFWwindow *window, double x, double y)
-{
   return;
 }
