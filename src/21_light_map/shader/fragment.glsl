@@ -8,13 +8,10 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos; // 相机位置
 
-uniform sampler2D texture2;
-
 // 定义材质结构体
 struct Material {
-  vec3 ambient; // 环境光 颜色
   sampler2D diffuse; // 漫反射贴图
-  vec3 specular; // 高光颜色
+  sampler2D specular; // 镜面光贴图
   float shininess; // 高光指数
 };
 uniform Material material;
@@ -33,6 +30,7 @@ void main() {
 
   vec4 objectColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
   vec3 diffuseTexture = vec3(texture(material.diffuse, outTexCoord));
+  vec3 specularTexture = vec3(texture(material.specular, outTexCoord));
 
   vec3 ambient = light.ambient * diffuseTexture; // 环境光
 
@@ -46,7 +44,7 @@ void main() {
   vec3 reflectDir = reflect(-lightDir, norm);
 
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-  vec3 specular = light.specular * spec * material.specular; // 镜面光
+  vec3 specular = light.specular * spec * specularTexture; // 镜面光
 
   vec3 result = (ambient + diffuse + specular) * vec3(objectColor);
 

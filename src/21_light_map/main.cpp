@@ -107,8 +107,10 @@ int main(int argc, char *argv[])
   SphereGeometry sphereGeometry(0.1, 10.0, 10.0);
 
   unsigned int diffuseMap = loadTexture("./static/texture/container2.png");
+  unsigned int specularMap = loadTexture("./static/texture/container2_specular.png");
   ourShader.use();
   ourShader.setInt("material.diffuse", 0);
+  ourShader.setInt("material.specular", 1);
 
   float factor = 0.0;
 
@@ -130,12 +132,11 @@ int main(int argc, char *argv[])
 
   // 传递材质属性
   ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-  ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-  ourShader.setFloat("material.shininess", 32.0f);
+  ourShader.setFloat("material.shininess", 64.0f);
 
   // 设置光照属性
-  ourShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-  ourShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
+  ourShader.setVec3("light.ambient", 0.4f, 0.4f, 0.4f);
+  ourShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f); // 将光照调暗了一些以搭配场景
   ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
   while (!glfwWindowShouldClose(window))
@@ -185,6 +186,9 @@ int main(int argc, char *argv[])
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specularMap);
 
     float radius = 10.0f;
     float camX = sin(glfwGetTime()) * radius;
