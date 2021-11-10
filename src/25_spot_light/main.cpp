@@ -138,6 +138,11 @@ int main(int argc, char *argv[])
   ourShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f); // 将光照调暗了一些以搭配场景
   ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
+  // 设置衰减
+  ourShader.setFloat("light.constant", 1.0f);
+  ourShader.setFloat("light.linear", 0.09f);
+  ourShader.setFloat("light.quadratic", 0.032f);
+
   // 定义是个不同的箱子位置
   glm::vec3 cubePositions[] = {
       glm::vec3(0.0f, 0.0f, 0.0f),
@@ -216,7 +221,9 @@ int main(int argc, char *argv[])
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
-    ourShader.setVec3("light.direction", lightPos); // 平行光的位置
+    ourShader.setVec3("light.position", camera.Position);              // 光源位置
+    ourShader.setVec3("light.direction", camera.Front);                // 聚光方向向量
+    ourShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f))); // 切光角
     ourShader.setVec3("viewPos", camera.Position);
 
     glm::mat4 model = glm::mat4(1.0f);
