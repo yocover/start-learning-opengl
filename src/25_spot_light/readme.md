@@ -85,9 +85,9 @@ void main() {
 }
 ```
 
+**边缘软化**
 
-
-![image-20211110150250772](images/image-20211110150250772.png)
+![image-20211110153757340](images/image-20211110153757340.png)
 
 ```glsl
 float theta = dot(lightDir, normalize(-light.direction));
