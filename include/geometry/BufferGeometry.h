@@ -12,11 +12,15 @@ using namespace std;
 
 const float PI = glm::pi<float>();
 
+// mesh.h中也定义此属性
 struct Vertex
 {
   glm::vec3 Position;  // 顶点位置
   glm::vec3 Normal;    // 法线
   glm::vec2 TexCoords; // 纹理坐标
+
+  glm::vec3 Tangent;
+  glm::vec3 Bitangent;
 };
 
 class BufferGeometry

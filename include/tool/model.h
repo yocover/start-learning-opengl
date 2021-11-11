@@ -1,19 +1,9 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <glad/glad.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include <tool/mesh.h>
-#include <tool/shader.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <tool/stb_image.h>
 
 #include <string>
 #include <fstream>

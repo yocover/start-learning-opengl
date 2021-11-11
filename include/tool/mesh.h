@@ -12,6 +12,7 @@
 
 using namespace std;
 
+#ifndef BUFFER_GROMETRY
 struct Vertex
 {
 	glm::vec3 Position;	 // 顶点属性
@@ -22,6 +23,7 @@ struct Vertex
 	glm::vec3 Tangent;
 	glm::vec3 Bitangent;
 };
+#endif
 
 struct Texture
 {
