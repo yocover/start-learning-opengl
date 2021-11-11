@@ -108,11 +108,12 @@ int main(int argc, char *argv[])
 
   unsigned int diffuseMap = loadTexture("./static/texture/container2.png");
   unsigned int specularMap = loadTexture("./static/texture/container2_specular.png");
-  unsigned int specularColorMap = loadTexture("./static/texture/lighting_maps_specular_color.png");
+  unsigned int awesomeMap = loadTexture("./static/texture/awesomeface.png");
   ourShader.use();
   ourShader.setInt("material.diffuse", 0);
   ourShader.setInt("material.specular", 1);
-  ourShader.setInt("material.specularColor", 2);
+
+  ourShader.setInt("awesomeMap", 2);
 
   float factor = 0.0;
 
@@ -133,10 +134,22 @@ int main(int argc, char *argv[])
   ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
   ourShader.setFloat("material.shininess", 32.0f);
 
-  // 设置光照属性
-  ourShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
-  ourShader.setVec3("light.diffuse", 0.9f, 0.9f, 0.9f); // 将光照调暗了一些以搭配场景
-  ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+  // 设置平行光光照属性
+  ourShader.setVec3("directionLight.ambient", 0.01f, 0.01f, 0.01f);
+  ourShader.setVec3("directionLight.diffuse", 0.2f, 0.2f, 0.2f); // 将光照调暗了一些以搭配场景
+  ourShader.setVec3("directionLight.specular", 1.0f, 1.0f, 1.0f);
+
+  // 设置聚光光照属性
+  ourShader.setVec3("spotLight.position", glm::vec3(0.0f, 0.0f, 2.0f));
+  ourShader.setVec3("spotLight.direction", camera.Front);
+  ourShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+  ourShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+  ourShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+  ourShader.setFloat("spotLight.constant", 1.0f);
+  ourShader.setFloat("spotLight.linear", 0.09);
+  ourShader.setFloat("spotLight.quadratic", 0.032);
+  ourShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+  ourShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
   // 设置衰减
   ourShader.setFloat("light.constant", 1.0f);
@@ -155,6 +168,19 @@ int main(int argc, char *argv[])
       glm::vec3(1.5f, 2.0f, -2.5f),
       glm::vec3(1.5f, 0.2f, -1.5f),
       glm::vec3(-1.3f, 1.0f, -1.5f)};
+
+  // 点光源的位置
+  glm::vec3 pointLightPositions[] = {
+      glm::vec3(0.7f, 0.2f, 1.5f),
+      glm::vec3(2.3f, -3.3f, -4.0f),
+      glm::vec3(-4.0f, 2.0f, -12.0f),
+      glm::vec3(0.0f, 0.0f, -3.0f)};
+
+  glm::vec3 pointLightColors[] = {
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 1.0f, 0.0f)};
 
   while (!glfwWindowShouldClose(window))
   {
@@ -206,7 +232,7 @@ int main(int argc, char *argv[])
     glBindTexture(GL_TEXTURE_2D, specularMap);
 
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, specularColorMap);
+    glBindTexture(GL_TEXTURE_2D, awesomeMap);
 
     float radius = 10.0f;
     float camX = sin(glfwGetTime()) * radius;
@@ -221,11 +247,22 @@ int main(int argc, char *argv[])
     ourShader.setMat4("view", view);
     ourShader.setMat4("projection", projection);
 
-    ourShader.setVec3("light.position", camera.Position);                   // 光源位置
-    ourShader.setVec3("light.direction", camera.Front);                     // 聚光方向向量
-    ourShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));      // 切光角
-    ourShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f))); // 切光角
+    ourShader.setVec3("directionLight.direction", lightPos); // 光源位置
     ourShader.setVec3("viewPos", camera.Position);
+
+    for (unsigned int i = 0; i < 4; i++)
+    {
+      // 设置点光源属性
+      ourShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightPositions[i]);
+      ourShader.setVec3("pointLights[" + std::to_string(i) + "].ambient", 0.01f, 0.01f, 0.01f);
+      ourShader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLightColors[i]);
+      ourShader.setVec3("pointLights[" + std::to_string(i) + "].specular", 1.0f, 1.0f, 1.0f);
+
+      // // 设置衰减
+      ourShader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
+      ourShader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
+      ourShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
+    }
 
     glm::mat4 model = glm::mat4(1.0f);
     for (unsigned int i = 0; i < 10; i++)
@@ -237,21 +274,36 @@ int main(int argc, char *argv[])
       model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
       ourShader.setMat4("model", model);
+
       glBindVertexArray(boxGeometry.VAO);
       glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
     }
 
     // 绘制灯光物体
     lightObjectShader.use();
-    model = glm::mat4(1.0f);
+    lightObjectShader.setMat4("view", view);
+    lightObjectShader.setMat4("projection", projection);
 
+    model = glm::mat4(1.0f);
     model = glm::translate(model, lightPos);
 
     lightObjectShader.setMat4("model", model);
-    lightObjectShader.setMat4("view", view);
-    lightObjectShader.setMat4("projection", projection);
+    lightObjectShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
     glBindVertexArray(sphereGeometry.VAO);
     glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+    for (unsigned int i = 0; i < 4; i++)
+    {
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, pointLightPositions[i]);
+
+      lightObjectShader.setMat4("model", model);
+      lightObjectShader.setVec3("lightColor", pointLightColors[i]);
+
+      glBindVertexArray(sphereGeometry.VAO);
+      glDrawElements(GL_TRIANGLES, sphereGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    }
 
     // 渲染 gui
     ImGui::Render();
@@ -322,6 +374,8 @@ unsigned int loadTexture(char const *path)
   unsigned int textureID;
   glGenTextures(1, &textureID);
 
+  // 图像y轴翻转
+  stbi_set_flip_vertically_on_load(true);
   int width, height, nrComponents;
   unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
   if (data)
