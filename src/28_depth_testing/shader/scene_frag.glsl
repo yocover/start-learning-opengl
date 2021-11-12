@@ -54,9 +54,13 @@ in vec3 outFragPos;
 uniform vec3 viewPos;
 uniform float factor; // 变化值
 
+float near = 0.1;
+float far = 100.0;
+
 vec3 CalcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+float LinearizeDepth(float depth, float near, float far);
 
 void main() {
 
@@ -135,4 +139,10 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
   diffuse *= attenuation * intensity;
   specular *= attenuation * intensity;
   return (ambient + diffuse + specular);
+}
+
+// 计算深度值
+float LinearizeDepth(float depth, float near, float far) {
+  float z = depth * 2.0 - 1.0;
+  return (2.0 * near * far) / (far + near - z * (far - near));
 }

@@ -38,7 +38,7 @@ float lastTime = 0.0f;
 float lastX = SCREEN_WIDTH / 2.0f; // 鼠标上一帧的位置
 float lastY = SCREEN_HEIGHT / 2.0f;
 
-Camera camera(glm::vec3(0.0, 0.0, 5.0));
+Camera camera(glm::vec3(0.0, 1.0, 6.0));
 
 using namespace std;
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glEnable(GL_DEPTH_TEST);
-  // glDepthFunc(GL_LESS);
+  glDepthFunc(GL_LESS);
 
   // 鼠标键盘事件
   // 1.注册窗口变化监听
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
       glm::vec3(0.7f, 1.0f, 1.5f),
       glm::vec3(2.3f, 3.0f, -4.0f),
       glm::vec3(-4.0f, 2.0f, 1.0f),
-      glm::vec3(0.0f, 1.0f, -3.0f)};
+      glm::vec3(1.4f, 2.0f, 0.3f)};
   // 点光源颜色
   glm::vec3 pointLightColors[] = {
       glm::vec3(1.0f, 0.0f, 0.0f),
@@ -247,9 +247,17 @@ int main(int argc, char *argv[])
     // 绘制砖块
     glBindTexture(GL_TEXTURE_2D, brickMap);
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0, 0.5, 0.0));
+    model = glm::scale(model, glm::vec3(2.0, 2.0, 2.0));
+    model = glm::translate(model, glm::vec3(1.0, 0.5, -1.0));
 
     sceneShader.setFloat("uvScale", 1.0f);
+    sceneShader.setMat4("model", model);
+
+    glBindVertexArray(boxGeometry.VAO);
+    glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.0, 0.5, 2.0));
     sceneShader.setMat4("model", model);
 
     glBindVertexArray(boxGeometry.VAO);
