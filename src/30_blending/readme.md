@@ -53,11 +53,8 @@
 
 ```
 
-
-
 ![image-20211112185526863](images/image-20211112185526863.png)
 
 ## 参考
 
-
-
+https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/03%20Blending/
