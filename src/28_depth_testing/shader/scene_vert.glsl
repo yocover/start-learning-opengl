@@ -9,6 +9,8 @@ out vec3 outFragPos;
 
 uniform float factor;
 
+uniform float uvScale;
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -19,7 +21,7 @@ void main() {
 
   outFragPos = vec3(model * vec4(Position, 1.0));
 
-  outTexCoord = TexCoords;
+  outTexCoord = TexCoords * uvScale;
   // 解决不等比缩放，对法向量产生的影响
   outNormal = mat3(transpose(inverse(model))) * Normal;
 }
