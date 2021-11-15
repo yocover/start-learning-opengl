@@ -95,6 +95,10 @@ int main(int argc, char *argv[])
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
+  // 启用面剔除
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+
   // 鼠标键盘事件
   // 1.注册窗口变化监听
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
