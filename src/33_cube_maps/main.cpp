@@ -21,6 +21,8 @@ void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const *path);
 unsigned int loadCubemap(vector<std::string> faces);
 
+void drawSkyBox(Shader shader, BoxGeometry geometry, unsigned int cubeMap);
+
 std::string Shader::dirName;
 
 int SCREEN_WIDTH = 800;
@@ -96,14 +98,13 @@ int main(int argc, char *argv[])
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  // 启用面剔除
-  // glEnable(GL_CULL_FACE);
-
   // 鼠标键盘事件
   // 1.注册窗口变化监听
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   // 2.鼠标事件
   glfwSetCursorPosCallback(window, mouse_callback);
+  // 3.将鼠标隐藏
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   Shader sceneShader("./shader/scene_vert.glsl", "./shader/scene_frag.glsl");
   Shader lightObjectShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
   PlaneGeometry groundGeometry(10.0, 10.0);            // 地面
   PlaneGeometry grassGeometry(1.0, 1.0);               // 草丛
   BoxGeometry containerGeometry(1.0, 1.0, 1.0);        // 箱子
-  BoxGeometry skyboxGeometry(2.0, 2.0, 2.0);           // 天空盒
+  BoxGeometry skyboxGeometry(1.0, 1.0, 1.0);           // 天空盒
   SphereGeometry pointLightGeometry(0.04, 10.0, 10.0); // 点光源位置显示
 
   unsigned int woodMap = loadTexture("./static/texture/wood.png");                         // 地面
@@ -167,12 +168,12 @@ int main(int argc, char *argv[])
 
   // 天空盒贴图
   vector<string> faces{
-      "./static/texture/skybox/right.jpg",
-      "./static/texture/skybox/left.jpg",
-      "./static/texture/skybox/top.jpg",
-      "./static/texture/skybox/bottom.jpg",
-      "./static/texture/skybox/front.jpg",
-      "./static/texture/skybox/back.jpg"};
+      "./static/texture/Park3Med/px.jpg",
+      "./static/texture/Park3Med/nx.jpg",
+      "./static/texture/Park3Med/py.jpg",
+      "./static/texture/Park3Med/ny.jpg",
+      "./static/texture/Park3Med/pz.jpg",
+      "./static/texture/Park3Med/nz.jpg"};
 
   unsigned int cubemapTexture = loadCubemap(faces);
 
@@ -204,6 +205,9 @@ int main(int argc, char *argv[])
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // 绘制天空盒
+    drawSkyBox(skyboxShader, skyboxGeometry, cubemapTexture);
+
     // 修改光源颜色
     glm::vec3 lightColor;
     lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -225,132 +229,137 @@ int main(int argc, char *argv[])
 
     // 绘制天空盒
     // *****************************************
-    glDepthFunc(GL_LEQUAL);
-    skyboxShader.use();
+    // glDepthFunc(GL_LEQUAL);
+    // glDisable(GL_DEPTH_TEST);
 
-    skyboxShader.setMat4("view", view);
-    skyboxShader.setMat4("projection", projection);
-    // skyboxShader.setInt("skyboxTexture", 0);
+    // skyboxShader.use();
+    // view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // 移除平移分量
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    // skyboxShader.setMat4("view", view);
+    // skyboxShader.setMat4("projection", projection);
 
-    glBindVertexArray(skyboxGeometry.VAO);
-    glDrawElements(GL_TRIANGLES, skyboxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    glDepthFunc(GL_LESS);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    // glBindVertexArray(skyboxGeometry.VAO);
+    // glDrawElements(GL_TRIANGLES, skyboxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+    // glBindVertexArray(0);
+    // glDepthFunc(GL_LESS);
+    // glEnable(GL_DEPTH_TEST);
+    // view = camera.GetViewMatrix();
+
     // *****************************************
 
-    // sceneShader.use();
-    // factor = glfwGetTime();
-    // sceneShader.setFloat("factor", -factor * 0.3);
-    // sceneShader.setMat4("view", view);
-    // sceneShader.setMat4("projection", projection);
+    sceneShader.use();
+    factor = glfwGetTime();
+    sceneShader.setFloat("factor", -factor * 0.3);
+    sceneShader.setMat4("view", view);
+    sceneShader.setMat4("projection", projection);
 
-    // sceneShader.setVec3("directionLight.direction", lightPos); // 光源位置
-    // sceneShader.setVec3("viewPos", camera.Position);
+    sceneShader.setVec3("directionLight.direction", lightPos); // 光源位置
+    sceneShader.setVec3("viewPos", camera.Position);
 
-    // pointLightPositions[0].z = camZ;
-    // pointLightPositions[0].x = camX;
+    pointLightPositions[0].z = camZ;
+    pointLightPositions[0].x = camX;
 
-    // for (unsigned int i = 0; i < 4; i++)
-    // {
+    for (unsigned int i = 0; i < 4; i++)
+    {
 
-    //   // 设置点光源属性
-    //   sceneShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightPositions[i]);
-    //   sceneShader.setVec3("pointLights[" + std::to_string(i) + "].ambient", 0.01f, 0.01f, 0.01f);
-    //   sceneShader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLightColors[i]);
-    //   sceneShader.setVec3("pointLights[" + std::to_string(i) + "].specular", 1.0f, 1.0f, 1.0f);
+      // 设置点光源属性
+      sceneShader.setVec3("pointLights[" + std::to_string(i) + "].position", pointLightPositions[i]);
+      sceneShader.setVec3("pointLights[" + std::to_string(i) + "].ambient", 0.01f, 0.01f, 0.01f);
+      sceneShader.setVec3("pointLights[" + std::to_string(i) + "].diffuse", pointLightColors[i]);
+      sceneShader.setVec3("pointLights[" + std::to_string(i) + "].specular", 1.0f, 1.0f, 1.0f);
 
-    //   // // 设置衰减
-    //   sceneShader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
-    //   sceneShader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
-    //   sceneShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
-    // }
+      // // 设置衰减
+      sceneShader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
+      sceneShader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
+      sceneShader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
+    }
 
-    // // 绘制地板
-    // // ********************************************************
-    // glm::mat4 model = glm::mat4(1.0f);
-    // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+    // 绘制地板
+    // ********************************************************
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 
-    // sceneShader.setFloat("uvScale", 4.0f);
-    // sceneShader.setMat4("model", model);
+    sceneShader.setFloat("uvScale", 4.0f);
+    sceneShader.setMat4("model", model);
 
-    // glBindVertexArray(groundGeometry.VAO);
-    // glDrawElements(GL_TRIANGLES, groundGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // glBindVertexArray(0);
-    // // ********************************************************
+    glBindVertexArray(groundGeometry.VAO);
+    glDrawElements(GL_TRIANGLES, groundGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    // ********************************************************
 
-    // // 绘制砖块
-    // // ----------------------------------------------------------
-    // glBindTexture(GL_TEXTURE_2D, brickMap);
-    // model = glm::mat4(1.0f);
-    // model = glm::translate(model, glm::vec3(1.0, 1.0, -1.0));
-    // model = glm::scale(model, glm::vec3(2.0, 2.0, 2.0));
+    // 绘制砖块
+    // ----------------------------------------------------------
+    glBindTexture(GL_TEXTURE_2D, brickMap);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(1.0, 1.0, -1.0));
+    model = glm::scale(model, glm::vec3(2.0, 2.0, 2.0));
 
-    // sceneShader.setFloat("uvScale", 1.0f);
-    // sceneShader.setMat4("model", model);
+    sceneShader.setFloat("uvScale", 1.0f);
+    sceneShader.setMat4("model", model);
 
-    // glBindVertexArray(containerGeometry.VAO);
-    // glDrawElements(GL_TRIANGLES, containerGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(containerGeometry.VAO);
+    glDrawElements(GL_TRIANGLES, containerGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
-    // model = glm::mat4(1.0f);
-    // model = glm::translate(model, glm::vec3(-1.0, 0.5, 2.0));
-    // sceneShader.setMat4("model", model);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.0, 0.5, 2.0));
+    sceneShader.setMat4("model", model);
 
-    // glBindVertexArray(containerGeometry.VAO);
-    // glDrawElements(GL_TRIANGLES, containerGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // // ----------------------------------------------------------
+    glBindVertexArray(containerGeometry.VAO);
+    glDrawElements(GL_TRIANGLES, containerGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    // ----------------------------------------------------------
 
-    // // 绘制草丛面板
-    // // ----------------------------------------------------------
-    // glBindVertexArray(grassGeometry.VAO);
-    // glBindTexture(GL_TEXTURE_2D, grassMap);
+    // 绘制草丛面板
+    // ----------------------------------------------------------
+    glBindVertexArray(grassGeometry.VAO);
+    glBindTexture(GL_TEXTURE_2D, grassMap);
 
-    // // 对透明物体进行动态排序
-    // std::map<float, glm::vec3> sorted;
-    // for (unsigned int i = 0; i < grassPositions.size(); i++)
-    // {
-    //   float distance = glm::length(camera.Position - grassPositions[i]);
-    //   sorted[distance] = grassPositions[i];
-    // }
+    // 对透明物体进行动态排序
+    std::map<float, glm::vec3> sorted;
+    for (unsigned int i = 0; i < grassPositions.size(); i++)
+    {
+      float distance = glm::length(camera.Position - grassPositions[i]);
+      sorted[distance] = grassPositions[i];
+    }
 
-    // for (std::map<float, glm::vec3>::reverse_iterator iterator = sorted.rbegin(); iterator != sorted.rend(); iterator++)
-    // {
-    //   model = glm::mat4(1.0f);
-    //   model = glm::translate(model, iterator->second);
-    //   sceneShader.setMat4("model", model);
-    //   glDrawElements(GL_TRIANGLES, grassGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // }
-    // // ----------------------------------------------------------
+    for (std::map<float, glm::vec3>::reverse_iterator iterator = sorted.rbegin(); iterator != sorted.rend(); iterator++)
+    {
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, iterator->second);
+      sceneShader.setMat4("model", model);
+      glDrawElements(GL_TRIANGLES, grassGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    // ----------------------------------------------------------
 
-    // // 绘制灯光物体
-    // // ************************************************************
-    // lightObjectShader.use();
-    // lightObjectShader.setMat4("view", view);
-    // lightObjectShader.setMat4("projection", projection);
+    // 绘制灯光物体
+    // ************************************************************
+    lightObjectShader.use();
+    lightObjectShader.setMat4("view", view);
+    lightObjectShader.setMat4("projection", projection);
 
-    // model = glm::mat4(1.0f);
-    // model = glm::translate(model, lightPos);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
 
-    // lightObjectShader.setMat4("model", model);
-    // lightObjectShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    lightObjectShader.setMat4("model", model);
+    lightObjectShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    // glBindVertexArray(pointLightGeometry.VAO);
-    // glDrawElements(GL_TRIANGLES, pointLightGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(pointLightGeometry.VAO);
+    glDrawElements(GL_TRIANGLES, pointLightGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
-    // for (unsigned int i = 0; i < 4; i++)
-    // {
-    //   model = glm::mat4(1.0f);
-    //   model = glm::translate(model, pointLightPositions[i]);
+    for (unsigned int i = 0; i < 4; i++)
+    {
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, pointLightPositions[i]);
 
-    //   lightObjectShader.setMat4("model", model);
-    //   lightObjectShader.setVec3("lightColor", pointLightColors[i]);
+      lightObjectShader.setMat4("model", model);
+      lightObjectShader.setVec3("lightColor", pointLightColors[i]);
 
-    //   glBindVertexArray(pointLightGeometry.VAO);
-    //   glDrawElements(GL_TRIANGLES, pointLightGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    // }
-    // // ************************************************************
+      glBindVertexArray(pointLightGeometry.VAO);
+      glDrawElements(GL_TRIANGLES, pointLightGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    // ************************************************************
 
     // 渲染 gui
     ImGui::Render();
@@ -457,11 +466,15 @@ unsigned int loadTexture(char const *path)
 }
 
 // 加载立方体贴图
+
 unsigned int loadCubemap(vector<std::string> faces)
 {
   unsigned int textureID;
   glGenTextures(1, &textureID);
   glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+  // 此处需要将y轴旋转关闭，若之前调用过loadTexture
+  stbi_set_flip_vertically_on_load(false);
 
   int width, height, nrChannels;
   for (unsigned int i = 0; i < faces.size(); i++)
@@ -486,4 +499,31 @@ unsigned int loadCubemap(vector<std::string> faces)
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   return textureID;
+}
+
+// *******************method*********************
+void drawSkyBox(Shader shader, BoxGeometry geometry, unsigned int cubeMap)
+{
+
+  glDepthFunc(GL_LEQUAL);
+  glDisable(GL_DEPTH_TEST);
+
+  glm::mat4 view = camera.GetViewMatrix();
+  glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+
+  shader.use();
+  view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // 移除平移分量
+
+  shader.setMat4("view", view);
+  shader.setMat4("projection", projection);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+  glBindVertexArray(geometry.VAO);
+  glDrawElements(GL_TRIANGLES, geometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+  glBindVertexArray(0);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_DEPTH_TEST);
+  view = camera.GetViewMatrix();
 }
