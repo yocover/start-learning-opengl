@@ -102,7 +102,10 @@ int main(int argc, char *argv[])
   // 3.将鼠标隐藏
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-  Shader sceneShader("./shader/scene_vert.glsl", "./shader/scene_frag.glsl");
+  Shader sceneShader1("./shader/scene_vert.glsl", "./shader/scene1_frag.glsl");
+  Shader sceneShader2("./shader/scene_vert.glsl", "./shader/scene2_frag.glsl");
+  Shader sceneShader3("./shader/scene_vert.glsl", "./shader/scene3_frag.glsl");
+  Shader sceneShader4("./shader/scene_vert.glsl", "./shader/scene4_frag.glsl");
 
   SphereGeometry sphereGeometry(1.0, 50.0, 50.0); // 圆球
   BoxGeometry boxGeometry(1.0, 1.0, 1.0);         // 盒子
@@ -111,25 +114,36 @@ int main(int argc, char *argv[])
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
   ImVec4 clear_color = ImVec4(25.0 / 255.0, 25.0 / 255.0, 25.0 / 255.0, 1.0); // 25, 25, 25
 
-  // 天空盒贴图
-  vector<string> faces{
-      "./static/texture/Park3Med/px.jpg",
-      "./static/texture/Park3Med/nx.jpg",
-      "./static/texture/Park3Med/py.jpg",
-      "./static/texture/Park3Med/ny.jpg",
-      "./static/texture/Park3Med/pz.jpg",
-      "./static/texture/Park3Med/nz.jpg"};
-
-  unsigned int cubemapTexture = loadCubemap(faces);
-
-  Model ourModel("./static/model/walt/WaltHead.obj");
-
   unsigned int uvMap = loadTexture("./static/texture/uv_grid_directx.jpg");
   unsigned int triMap = loadTexture("./static/texture/tri_pattern.jpg");
 
-  sceneShader.use();
-  sceneShader.setInt("uvMap", 0);
-  sceneShader.setInt("triMap", 1);
+  // 获取绑定点
+  unsigned int uniformBlockIndex_1 = glGetUniformBlockIndex(sceneShader1.ID, "Matrices");
+  unsigned int uniformBlockIndex_2 = glGetUniformBlockIndex(sceneShader2.ID, "Matrices");
+  unsigned int uniformBlockIndex_3 = glGetUniformBlockIndex(sceneShader3.ID, "Matrices");
+  unsigned int uniformBlockIndex_4 = glGetUniformBlockIndex(sceneShader4.ID, "Matrices");
+
+  // 将顶点着色器中uniform块设置为绑定点0
+  glUniformBlockBinding(sceneShader1.ID, uniformBlockIndex_1, 0);
+  glUniformBlockBinding(sceneShader2.ID, uniformBlockIndex_2, 0);
+  glUniformBlockBinding(sceneShader3.ID, uniformBlockIndex_3, 0);
+  glUniformBlockBinding(sceneShader4.ID, uniformBlockIndex_4, 0);
+
+  // 创建uniform缓冲对象，并将其绑定到绑定点0
+  unsigned int uboMatrices;
+  glGenBuffers(1, &uboMatrices);
+
+  glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+  glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW); // 分配内存
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+  glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4)); //将特定范围链接到绑定点0
+
+  // 进入渲染循环之前填充投影矩阵
+  glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+  glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
   while (!glfwWindowShouldClose(window))
   {
@@ -159,25 +173,45 @@ int main(int argc, char *argv[])
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-
-    sceneShader.use();
-    sceneShader.setMat4("model", model);
-    sceneShader.setMat4("view", view);
-    sceneShader.setMat4("projection", projection);
-    sceneShader.setVec3("objectColor", glm::vec3(0.2, 1.0, 0.6));
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, uvMap);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, triMap);
-
     glBindVertexArray(boxGeometry.VAO);
+
+    float rotate = glfwGetTime() * 0.2f;
+    glm::qua<float> qu = glm::qua<float>(glm::vec3(rotate, rotate, rotate));
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f));
+    model = model * glm::mat4_cast(qu);
+    sceneShader1.use();
+    sceneShader1.setMat4("model", model);
     glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f));
+    model = model * glm::mat4_cast(qu);
+    sceneShader2.use();
+    sceneShader2.setMat4("model", model);
+    glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f));
+    model = model * glm::mat4_cast(qu);
+    sceneShader3.use();
+    sceneShader3.setMat4("model", model);
+    glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f));
+    model = model * glm::mat4_cast(qu);
+    sceneShader4.use();
+    sceneShader4.setMat4("model", model);
+    glDrawElements(GL_TRIANGLES, boxGeometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     // 渲染 gui
     ImGui::Render();
