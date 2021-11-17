@@ -31,7 +31,7 @@ public:
 
         if (geometryPath != nullptr)
         {
-            gemo_string = vertexPath;
+            gemo_string = geometryPath;
             gemo_char = gemo_string.insert(2, dirName).c_str();
         }
 
