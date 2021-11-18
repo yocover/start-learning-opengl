@@ -7,12 +7,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out VS_OUT {
-  vec2 TexCoord;
-} vs_out;
-
 void main() {
-  vs_out.TexCoord = TexCoords;
-  gl_Position = projection * view * model * vec4(Position, 1.0f);
   gl_PointSize = 5.0;
+  gl_Position = projection * view * model * vec4(Position, 1.0f);
 }

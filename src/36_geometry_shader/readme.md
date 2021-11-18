@@ -1,5 +1,7 @@
 ## 几何着色器
 
+### 绘制多边形
+
 设置输入的图元类型
 
 ```glsl
@@ -99,7 +101,39 @@ void main() {
 
 ![image-20211117184622374](images/image-20211117184622374.png)
 
+### 爆破物体
 
+使用叉乘 cross获取垂直与其它两个向量的一个向量，使用减法获取平行于三角形表面的向量a和b
+
+```glsl
+vec3 GetNormal()
+{
+   vec3 a = vec3(gl_in[0].gl_Position) - vec3(gl_in[1].gl_Position);
+   vec3 b = vec3(gl_in[2].gl_Position) - vec3(gl_in[1].gl_Position);
+   return normalize(cross(a, b));
+}
+```
+
+使位置向量沿着法向量进行位移
+
+```glsl
+vec4 explode(vec4 position, vec3 normal)
+{
+    float magnitude = 2.0;
+    vec3 direction = normal * ((sin(time) + 1.0) / 2.0) * magnitude; 
+    return position + vec4(direction, 0.0);
+}
+```
+
+![image-20211118105540181](images/image-20211118105540181.png)
+
+**参考**：https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/09%20Geometry%20Shader/#_4
+
+### 法向量可视化
+
+![image-20211118114310556](images/image-20211118114310556.png)
+
+![image-20211118140254815](images/image-20211118140254815.png)
 
 ## 参考
 
