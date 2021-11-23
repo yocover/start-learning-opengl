@@ -23,7 +23,7 @@ void main() {
   vec3 normal = normalize(outNormal);
   vec3 lightDir = normalize(lightPos - outFragPos);
 
-  float diff = max(dot(normal, lightDir), 0.0);
+  float diff = max(dot(lightDir, normal), 0.0);
   vec3 diffuse = diff * color; // 漫反射
 
   vec3 viewDir = normalize(viewPos - outFragPos);
@@ -31,7 +31,7 @@ void main() {
   float spec = 0.0;
   if(blinn) {
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    spec = pow(max(dot(viewDir, halfwayDir), 0.0), 16.0);
+    spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0);
 
   } else {
     vec3 reflectDir = reflect(-lightDir, normal);

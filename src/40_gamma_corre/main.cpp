@@ -88,8 +88,13 @@ int main(int argc, char *argv[])
   // 设置视口
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glEnable(GL_PROGRAM_POINT_SIZE);
+
+  // 启用混合
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // 启用gamma校正
+  // glEnable(GL_FRAMEBUFFER_SRGB);
 
   // 深度测试
   glEnable(GL_DEPTH_TEST);
@@ -164,9 +169,8 @@ int main(int argc, char *argv[])
     sceneShader.setVec3("viewPos", camera.Position);
 
     glm::vec3 lightPos = glm::vec3(lightPosition.x + glm::sin(glfwGetTime()) * 2.0, lightPosition.y, lightPosition.z);
-    sceneShader.setVec3("lightPos", lightPosition);              // 光源位置
-    sceneShader.setVec3("lightColor", glm::vec3(1.0, 1.0, 1.0)); // 光源颜色
-    sceneShader.setFloat("strength", 0.05);                      // 环境光强度
+    sceneShader.setVec3("lightPos", lightPosition); // 光源位置
+    sceneShader.setFloat("strength", 0.01);         // 环境光强度
     sceneShader.setBool("blinn", false);
 
     // 绘制地板
