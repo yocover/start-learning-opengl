@@ -21,10 +21,10 @@ unsigned int loadTexture(char const *path);
 
 std::string Shader::dirName;
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 600;
-// int SCREEN_WIDTH = 1600;
-// int SCREEN_HEIGHT = 1200;
+// int SCREEN_WIDTH = 800;
+// int SCREEN_HEIGHT = 600;
+int SCREEN_WIDTH = 1600;
+int SCREEN_HEIGHT = 1200;
 
 // camera value
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   // 2.鼠标事件
   glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   Shader ourShader("./shader/vertex.glsl", "./shader/fragment.glsl");
   Shader lightObjectShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");

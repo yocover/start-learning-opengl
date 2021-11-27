@@ -25,10 +25,10 @@ unsigned int loadTexture(char const *path);
 
 std::string Shader::dirName;
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 600;
-// int SCREEN_WIDTH = 1600;
-// int SCREEN_HEIGHT = 1200;
+// int SCREEN_WIDTH = 800;
+// int SCREEN_HEIGHT = 600;
+int SCREEN_WIDTH = 1600;
+int SCREEN_HEIGHT = 1200;
 
 // camera value
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -186,7 +186,8 @@ int main(int argc, char *argv[])
       glm::vec3(0.0f, 0.0f, 1.0f),
       glm::vec3(0.0f, 1.0f, 0.0f)};
 
-  Model ourModel("./static/model/nanosuit/nanosuit.obj");
+  // Model ourModel("./static/model/nanosuit/nanosuit.obj");
+  Model ourModel("./static/model/cerberus/Cerberus.obj");
 
   while (!glfwWindowShouldClose(window))
   {
