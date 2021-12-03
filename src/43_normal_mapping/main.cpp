@@ -179,6 +179,8 @@ int main(int argc, char *argv[])
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::scale(model, glm::vec3(5, 5, 5));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+
     sceneShader.setFloat("uvScale", 1.0f);
     sceneShader.setMat4("model", model);
     drawMesh(planeGeometry);
