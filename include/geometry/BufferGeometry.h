@@ -20,8 +20,8 @@ struct Vertex
   glm::vec3 Normal;    // 法线
   glm::vec2 TexCoords; // 纹理坐标
 
-  glm::vec3 Tangent;
-  glm::vec3 Bitangent;
+  glm::vec3 Tangent;   // 切线
+  glm::vec3 Bitangent; // 副切线
 };
 
 class BufferGeometry
@@ -41,6 +41,11 @@ public:
       // cout << "TexCoords ->> x: " << vertices[i].TexCoords.x << ",y: " << vertices[i].TexCoords.y << endl;
       // cout << "-----------------" << endl;
     }
+  }
+
+  // 计算切线向量并添加到顶点属性中
+  void computeTangents()
+  {
   }
 
   void dispose()
