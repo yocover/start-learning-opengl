@@ -19,6 +19,8 @@
 - 切线空间时位于三角形表面之上的空间。
 - 使用一个特定的矩阵就能将本地/切线空间中的法线向量转成世界或者视图坐标，使它们转向到最终的贴图表面的方向。
 
+![image-20211208103956734](images/image-20211208103956734.png)
+
 ## 参考
 
 https://learnopengl-cn.github.io/05%20Advanced%20Lighting/04%20Normal%20Mapping/#_1
