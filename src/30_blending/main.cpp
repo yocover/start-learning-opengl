@@ -129,8 +129,10 @@ int main(int argc, char *argv[])
   glm::vec3 lightPosition = glm::vec3(1.0, 2.5, 2.0); // 光照位置
 
   // 设置平行光光照属性
-  sceneShader.setVec3("directionLight.ambient", 0.6f, 0.6f, 0.6f);
-  sceneShader.setVec3("directionLight.diffuse", 0.9f, 0.9f, 0.9f); // 将光照调暗了一些以搭配场景
+  sceneShader.use();
+
+  sceneShader.setVec3("directionLight.ambient", 0.05f, 0.05f, 0.05f);
+  sceneShader.setVec3("directionLight.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
   sceneShader.setVec3("directionLight.specular", 1.0f, 1.0f, 1.0f);
 
   // 设置衰减

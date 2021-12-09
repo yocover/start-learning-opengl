@@ -1,99 +1,147 @@
 #version 330 core
 out vec4 FragColor;
 
-in VS_OUT {
-  vec3 FragPos;
-  vec2 TexCoords;
-  vec3 TangentLightPos;
-  vec3 TangentViewPos;
-  vec3 TangentFragPos;
-} fs_in;
+// 定向光
+struct DirectionLight {
+  vec3 direction;
 
-uniform sampler2D diffuseMap; // 漫反射贴图
-uniform sampler2D normalMap;  // 法线贴图
-uniform sampler2D depthMap;   // 高度贴图
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
 
-uniform float strength;
-uniform bool parallax;
-uniform float height_scale;
+// 点光源
+struct PointLight {
+  vec3 position;
 
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
-  // number of depth layers
-  const float minLayers = 10;
-  const float maxLayers = 20;
-  float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
-    // calculate the size of each layer
-  float layerDepth = 1.0 / numLayers;
-    // depth of current layer
-  float currentLayerDepth = 0.0;
-    // the amount to shift the texture coordinates per layer (from vector P)
-  vec2 P = viewDir.xy / viewDir.z * height_scale;
-  vec2 deltaTexCoords = P / numLayers;
+  float constant;
+  float linear;
+  float quadratic;
 
-    // get initial values
-  vec2 currentTexCoords = texCoords;
-  float currentDepthMapValue = texture(depthMap, currentTexCoords).r;
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
 
-  while(currentLayerDepth < currentDepthMapValue) {
-        // shift texture coordinates along direction of P
-    currentTexCoords -= deltaTexCoords;
-        // get depthmap value at current texture coordinates
-    currentDepthMapValue = texture(depthMap, currentTexCoords).r;  
-        // get depth of next layer
-    currentLayerDepth += layerDepth;
-  }
+// 聚光灯
+struct SpotLight {
+  vec3 position;
+  vec3 direction;
+  float cutOff;
+  float outerCutOff;
 
-    // -- parallax occlusion mapping interpolation from here on
-    // get texture coordinates before collision (reverse operations)
-  vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+  float constant;
+  float linear;
+  float quadratic;
 
-    // get depth after and before collision for linear interpolation
-  float afterDepth = currentDepthMapValue - currentLayerDepth;
-  float beforeDepth = texture(depthMap, prevTexCoords).r - currentLayerDepth + layerDepth;
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
 
-    // interpolation of texture coordinates
-  float weight = afterDepth / (afterDepth - beforeDepth);
-  vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+#define NR_POINT_LIGHTS 4
 
-  return finalTexCoords;
-}
+uniform DirectionLight directionLight;
+uniform PointLight pointLights[NR_POINT_LIGHTS];
+uniform SpotLight spotLight;
+
+uniform sampler2D brickMap; // 贴图
+
+in vec2 outTexCoord;
+in vec3 outNormal;
+in vec3 outFragPos;
+
+uniform vec3 viewPos;
+uniform float factor; // 变化值
+
+vec3 CalcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir);
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+float LinearizeDepth(float depth, float near, float far);
 
 void main() {
 
-  vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
+  vec3 viewDir = normalize(viewPos - outFragPos);
+  vec3 normal = normalize(outNormal);
 
-  vec2 texCoords = fs_in.TexCoords;
+  // 定向光照
+  vec3 result = CalcDirectionLight(directionLight, normal, viewDir);
 
-  if(parallax) {
-    texCoords = ParallaxMapping(fs_in.TexCoords, viewDir);
-    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-      discard;
+  // 点光源
+  for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+    result += CalcPointLight(pointLights[i], normal, outFragPos, viewDir);
   }
 
-  float gamma = 2.2;
-  vec3 color = pow(texture(diffuseMap, texCoords).rgb, vec3(gamma));
+  vec4 texMap = texture(brickMap, outTexCoord);
 
-  vec3 ambient = strength * color; // 环境光
+  vec4 color = vec4(result, 1.0) * texMap;
 
-  // vec3 normal = normalize(oNormal);
-  // 从法线贴图获取[0,1]范围的法线值
-  vec3 normal = texture(normalMap, texCoords).rgb;
-  // 将法线向量转换到[-1，1]范围
-  normal = normalize(normal * 2.0 - 1.0);
+  FragColor = vec4(color);
+}
 
-  vec3 lightDir = normalize(fs_in.TangentLightPos - fs_in.TangentFragPos);
+// 计算定向光
+vec3 CalcDirectionLight(DirectionLight light, vec3 normal, vec3 viewDir) {
+  vec3 lightDir = normalize(light.direction);
+  float diff = max(dot(normal, lightDir), 0.0);
+  vec3 reflectDir = reflect(-lightDir, normal);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-  float diff = max(dot(lightDir, normal), 0.0);
-  vec3 diffuse = diff * color; // 漫反射
+  // 合并
+  vec3 ambient = light.ambient;
+  vec3 diffuse = light.diffuse * diff;
+  vec3 specular = light.specular * spec;
 
-  // vec3 reflectDir = reflect(-lightDir, normal);
-  vec3 halfwayDir = normalize(lightDir + viewDir);
-  float spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
+  return ambient + diffuse + specular;
+}
 
-  vec3 specular = vec3(0.3) * spec; // 镜面光
-  vec3 result = (ambient + diffuse + specular);
+// 计算点光源
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
+  vec3 lightDir = normalize(light.position - fragPos);
+    // 漫反射着色
+  float diff = max(dot(normal, lightDir), 0.0);
+    // 镜面光着色
+  vec3 reflectDir = reflect(-lightDir, normal);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    // 衰减
+  float distance = length(light.position - fragPos);
+  float attenuation = 1.0 / (light.constant + light.linear * distance +
+    light.quadratic * (distance * distance));    
+    // 合并结果
+  vec3 ambient = light.ambient;
+  vec3 diffuse = light.diffuse * diff;
+  vec3 specular = light.specular * spec;
+  ambient *= attenuation;
+  diffuse *= attenuation;
+  specular *= attenuation;
+  return (ambient + diffuse + specular);
+}
 
-  FragColor = vec4(result, 1.0);
-  FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / gamma));
+// 计算聚光灯
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
+  vec3 lightDir = normalize(light.position - fragPos);
+  float diff = max(dot(normal, lightDir), 0.0);
+  vec3 reflectDir = reflect(-lightDir, normal);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
+  float distance = length(light.position - fragPos);
+  float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+  float theta = dot(lightDir, normalize(-light.direction));
+  float epsilon = light.cutOff - light.outerCutOff;
+  float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+  vec3 ambient = light.ambient;
+  vec3 diffuse = light.diffuse * diff;
+  vec3 specular = light.specular * spec;
+
+  ambient *= attenuation * intensity;
+  diffuse *= attenuation * intensity;
+  specular *= attenuation * intensity;
+  return (ambient + diffuse + specular);
+}
+
+// 计算深度值
+float LinearizeDepth(float depth, float near, float far) {
+  float z = depth * 2.0 - 1.0;
+  return (2.0 * near * far) / (far + near - z * (far - near));
 }
