@@ -1,5 +1,6 @@
 #version 330 core
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 BrightColor;
 
 // 定向光
 struct DirectionLight {
@@ -23,17 +24,18 @@ struct PointLight {
   vec3 specular;
 };
 
+in VS_OUT {
+  vec3 FragPos;
+  vec3 Normal;
+  vec2 TexCoords;
+} fs_in;
+
 #define NR_POINT_LIGHTS 4
 
 uniform DirectionLight directionLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
 
 uniform sampler2D brickMap; // 贴图
-
-in vec2 outTexCoord;
-in vec3 outNormal;
-in vec3 outFragPos;
 
 uniform vec3 viewPos;
 
@@ -42,20 +44,28 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main() {
 
-  vec3 viewDir = normalize(viewPos - outFragPos);
-  vec3 normal = normalize(outNormal);
+  // 计算光照
+  vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+  vec3 normal = normalize(fs_in.Normal);
 
   // 定向光照
   vec3 result = CalcDirectionLight(directionLight, normal, viewDir);
 
   // 点光源
   for(int i = 0; i < NR_POINT_LIGHTS; i++) {
-    result += CalcPointLight(pointLights[i], normal, outFragPos, viewDir);
+    result += CalcPointLight(pointLights[i], normal, fs_in.FragPos, viewDir);
   }
 
-  vec4 texMap = texture(brickMap, outTexCoord);
+  vec4 texMap = texture(brickMap, fs_in.TexCoords);
 
   vec4 color = vec4(result, 1.0) * texMap;
+
+  // check whether result is higher than some threshold, if so, output as bloom threshold color
+  float brightness = dot(vec3(color.rgb), vec3(0.2126, 0.7152, 0.0722));
+  if(brightness > 1.0)
+    BrightColor = vec4(color);
+  else
+    BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   FragColor = vec4(color);
 }
