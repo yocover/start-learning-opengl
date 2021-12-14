@@ -14,8 +14,6 @@
 #include <tool/stb_image.h>
 
 #include <tool/gui.h>
-#include <tool/mesh.h>
-#include <tool/model.h>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
@@ -45,7 +43,7 @@ float lastTime = 0.0f;
 float lastX = SCREEN_WIDTH / 2.0f; // 鼠标上一帧的位置
 float lastY = SCREEN_HEIGHT / 2.0f;
 
-Camera camera(glm::vec3(0.0, 1.0, 10.0));
+Camera camera(glm::vec3(0.0, 0.0, 10.0));
 
 using namespace std;
 
@@ -113,12 +111,14 @@ int main(int argc, char *argv[])
 
   Shader geometryShader("./shader/g_buffer_vert.glsl", "./shader/g_buffer_frag.glsl");
   Shader sceneShader("./shader/scene_vert.glsl", "./shader/scene_frag.glsl");
-  // Shader lightShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
+  Shader lightShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
 
   PlaneGeometry groundGeometry(10.0, 10.0);            // 地面
   PlaneGeometry grassGeometry(1.0, 1.0);               // 草丛
   BoxGeometry boxGeometry(1.0, 1.0, 1.0);              // 盒子
-  SphereGeometry pointLightGeometry(0.05, 50.0, 50.0); // 点光源位置显示
+  SphereGeometry pointLightGeometry(0.07, 20.0, 20.0); // 点光源位置显示
+
+  SphereGeometry objectGeometry(1.0, 50.0, 50.0); // 圆球
 
   PlaneGeometry quadGeometry(2.0, 2.0); // hdr输出平面
 
@@ -169,31 +169,28 @@ int main(int argc, char *argv[])
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // ***********************************************************
 
-  Model planet("./static/model/nanosuit/nanosuit.obj");
   vector<glm::vec3> objectPositions{
-      glm::vec3(-3.0, -3.0, -3.0),
-      glm::vec3(0.0, -3.0, -3.0),
-      glm::vec3(3.0, -3.0, -3.0),
-      glm::vec3(-3.0, -3.0, 0.0),
-      glm::vec3(0.0, -3.0, 0.0),
-      glm::vec3(3.0, -3.0, 0.0),
-      glm::vec3(-3.0, -3.0, 3.0),
-      glm::vec3(0.0, -3.0, 3.0),
-      glm::vec3(3.0, -3.0, 3.0)};
+      glm::vec3(-3.0, -1.0, -3.0),
+      glm::vec3(0.0, -1.0, -3.0),
+      glm::vec3(3.0, -1.0, -3.0),
+      glm::vec3(-3.0, -1.0, 0.0),
+      glm::vec3(0.0, -1.0, 0.0),
+      glm::vec3(3.0, -1.0, 0.0),
+      glm::vec3(-3.0, -1.0, 3.0),
+      glm::vec3(0.0, -1.0, 3.0),
+      glm::vec3(3.0, -1.0, 3.0)};
 
-  const unsigned int NR_LIGHTS = 2;
+  const unsigned int NR_LIGHTS = 32;
   std::vector<glm::vec3> lightPositions;
   std::vector<glm::vec3> lightColors;
   srand(13);
   for (unsigned int i = 0; i < NR_LIGHTS; i++)
   {
-    // Calculate slightly random offsets
     float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
     float yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
     float zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
     lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 
-    // Also calculate random color
     float rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
     float gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
     float bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
@@ -246,10 +243,9 @@ int main(int argc, char *argv[])
     {
       model = glm::mat4(1.0f);
       model = glm::translate(model, objectPositions[i]);
-      model = glm::scale(model, glm::vec3(0.25f));
+      model = glm::scale(model, glm::vec3(0.5f));
       geometryShader.setMat4("model", model);
-
-      planet.Draw(geometryShader);
+      drawMesh(objectGeometry);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -282,6 +278,31 @@ int main(int argc, char *argv[])
     model = glm::mat4(1.0f);
     sceneShader.setMat4("model", model);
     drawMesh(quadGeometry);
+
+    // 延迟结合正向渲染
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // 指定默认的帧缓冲为写缓冲
+    // 复制gbuffer的深度信息到默认帧缓冲的深度缓冲
+    glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 绘制灯光物体
+    // ************************************************************
+    lightShader.use();
+    lightShader.setMat4("view", view);
+    lightShader.setMat4("projection", projection);
+
+    for (unsigned int i = 0; i < lightPositions.size(); i++)
+    {
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, lightPositions[i]);
+
+      lightShader.setMat4("model", model);
+      lightShader.setVec3("lightColor", lightColors[i]);
+
+      drawMesh(pointLightGeometry);
+    }
+    // ************************************************************
 
     // 渲染 gui
     ImGui::Render();
