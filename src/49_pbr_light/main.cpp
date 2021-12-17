@@ -118,7 +118,8 @@ int main(int argc, char *argv[])
   // 3.将鼠标隐藏
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-  Shader sceneShader("./shader/scene_vert.glsl", "./shader/scene_frag.glsl");
+  Shader sceneShader("./shader/scene_vert.glsl", "./shader/scene_texture_frag.glsl");
+  Shader sceneTextureShader("./shader/scene_vert.glsl", "./shader/scene_texture_frag.glsl");
   Shader lightObjShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
 
   PlaneGeometry groundGeometry(10.0, 10.0);            // 地面
@@ -149,6 +150,25 @@ int main(int argc, char *argv[])
   sceneShader.use();
   sceneShader.setVec3("albedo", 0.0f, 0.5f, 0.0f);
   sceneShader.setFloat("ao", 1.0f);
+
+  unsigned int albedoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_albedo.png");
+  unsigned int normalMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_normal.png");
+  unsigned int metallicMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_metallic.png");
+  unsigned int roughnessMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_roughness.png");
+  unsigned int aoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_ao.png");
+
+  // unsigned int albedoMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_albedo.png");
+  // unsigned int normalMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_normal.png");
+  // unsigned int roughnessMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_roughness.png");
+  // unsigned int metallicMap = 0;
+  // unsigned int aoMap = 0;
+
+  // 设置贴图
+  sceneShader.setInt("albedoMap", 0);
+  sceneShader.setInt("normalMap", 1);
+  sceneShader.setInt("metallicMap", 2);
+  sceneShader.setInt("roughnessMap", 3);
+  sceneShader.setInt("aoMap", 4);
 
   while (!glfwWindowShouldClose(window))
   {
@@ -184,6 +204,9 @@ int main(int argc, char *argv[])
     float camX = sin(glfwGetTime() * 0.5) * radius;
     float camZ = cos(glfwGetTime() * 0.5) * radius;
 
+    lightPositions[1].x = camX;
+    lightPositions[1].y = camZ;
+
     for (unsigned int i = 0; i < lightPositions.size(); i++)
     {
       glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 15.0, 0.0, 0.0);
@@ -193,12 +216,21 @@ int main(int argc, char *argv[])
       sceneShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
     }
 
-    lightPositions[1].x = camX;
-    lightPositions[1].z = camZ;
-
     sceneShader.setMat4("projection", projection);
     sceneShader.setMat4("view", view);
     sceneShader.setVec3("camPos", camera.Position);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, albedoMap);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, normalMap);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, metallicMap);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, roughnessMap);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, aoMap);
+
     for (int row = 0; row < nrRows; ++row)
     {
       sceneShader.setFloat("metallic", (float)row / (float)nrRows);
@@ -226,8 +258,6 @@ int main(int argc, char *argv[])
       glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
       newPos = lightPositions[i];
 
-      lightPositions[1].x = camX;
-      lightPositions[1].z = camZ;
       model = glm::mat4(1.0f);
       model = glm::translate(model, newPos);
       lightObjShader.setMat4("model", model);
