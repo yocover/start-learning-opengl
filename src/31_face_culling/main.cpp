@@ -22,10 +22,10 @@ unsigned int loadTexture(char const *path);
 
 std::string Shader::dirName;
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 600;
-// int SCREEN_WIDTH = 1600;
-// int SCREEN_HEIGHT = 1200;
+// int SCREEN_WIDTH = 800;
+// int SCREEN_HEIGHT = 600;
+int SCREEN_WIDTH = 1600;
+int SCREEN_HEIGHT = 1200;
 
 // camera value
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 
   // 启用面剔除
   glEnable(GL_CULL_FACE);
-  glCullFace(GL_FRONT);
+  glCullFace(GL_BACK);
 
   // 鼠标键盘事件
   // 1.注册窗口变化监听

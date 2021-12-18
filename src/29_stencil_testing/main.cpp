@@ -161,8 +161,6 @@ int main(int argc, char *argv[])
       glm::vec3(0.0f, 0.0f, 1.0f),
       glm::vec3(0.0f, 1.0f, 0.0f)};
 
-  sceneShader.setBool("stenci", false);
-
   while (!glfwWindowShouldClose(window))
   {
     processInput(window);
@@ -185,10 +183,10 @@ int main(int argc, char *argv[])
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //ImGui::Begin("controls");
-    //ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    //ImGui::End();
-    // *************************************************************************
+    // ImGui::Begin("controls");
+    // ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    // ImGui::End();
+    //  *************************************************************************
 
     // 渲染指令
     // ...
@@ -285,7 +283,7 @@ int main(int argc, char *argv[])
     glStencilMask(0x00);
     glDisable(GL_DEPTH_TEST);
 
-    sceneShader.setBool("stenci", true);
+    sceneShader.setFloat("stenci", 1.0);
     float scale = 1.03;
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(1.0, 1.0, -1.0));
@@ -309,7 +307,7 @@ int main(int argc, char *argv[])
     glStencilMask(0xff);
     glStencilFunc(GL_ALWAYS, 0, 0xff);
     glEnable(GL_DEPTH_TEST);
-    sceneShader.setBool("stenci", false);
+    sceneShader.setFloat("stenci", 0.0);
 
     // -----------------------------------------------------------
 

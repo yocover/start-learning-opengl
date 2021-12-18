@@ -28,10 +28,10 @@ void drawSkyBox(Shader shader, BoxGeometry geometry, unsigned int cubeMap);
 
 std::string Shader::dirName;
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 600;
-// int SCREEN_WIDTH = 1600;
-// int SCREEN_HEIGHT = 1200;
+// int SCREEN_WIDTH = 800;
+// int SCREEN_HEIGHT = 600;
+int SCREEN_WIDTH = 1600;
+int SCREEN_HEIGHT = 1200;
 
 // delta time
 float deltaTime = 0.0f;

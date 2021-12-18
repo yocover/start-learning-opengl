@@ -54,7 +54,7 @@ in vec3 outFragPos;
 uniform vec3 viewPos;
 uniform float factor; // 变化值
 
-uniform bool stenci; // 绘制边框颜色
+uniform float stenci; // 绘制边框颜色
 
 float near = 0.1;
 float far = 100.0;
@@ -79,7 +79,7 @@ void main() {
 
   result *= texture(brickMap, outTexCoord).rgb;
 
-  result = mix(result, vec3(0.0, 0.0, 1.0), stenci);
+  result = mix(result, vec3(0.0f, 0.0f, 1.0f), stenci);
   FragColor = vec4(result, 1.0);
 }
 

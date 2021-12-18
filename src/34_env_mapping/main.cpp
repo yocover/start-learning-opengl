@@ -177,6 +177,7 @@ int main(int argc, char *argv[])
     model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 
     refractShader.setMat4("model", model);
+
     refractShader.setVec3("objectColor", glm::vec3(0.1, 0.0, 0.1));
     ourModel.Draw(refractShader);
 
