@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
   Shader testBrdfShader("./shader/test_brdf_vert.glsl", "./shader/test_brdf_frag.glsl");
 
-  PlaneGeometry quadGeometry(2.0, 2.0);                // 屏幕四边形
+  PlaneGeometry quadGeometry(1.0, 1.0);                // 屏幕四边形
   BoxGeometry boxGeometry(5.0, 5.0, 5.0);              // 盒子
   SphereGeometry pointLightGeometry(0.17, 64.0, 64.0); // 点光源位置显示
   SphereGeometry objectGeometry(1.0, 64.0, 64.0);      // 圆球
@@ -261,7 +261,6 @@ int main(int argc, char *argv[])
   glViewport(0, 0, 32, 32);
   glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
   for (unsigned int i = 0; i < 6; ++i)
   {
     irradianceShader.setMat4("view", captureViews[i]);
@@ -446,10 +445,11 @@ int main(int argc, char *argv[])
     // -------------------
 
     // 渲染 BRDF 贴图
-    testBrdfShader.use();
-    testBrdfShader.setInt("brdfTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+    // testBrdfShader.use();
+    // testBrdfShader.setInt("brdfTexture", 0);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+    brdfShader.use();
     drawMesh(quadGeometry);
 
     // 绘制灯光物体
