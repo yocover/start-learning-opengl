@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   Shader lightObjShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
   Shader cubemapShader("./shader/cubemap_vert.glsl", "./shader/cubemap_frag.glsl");
   Shader envmapShader("./shader/envmap_vert.glsl", "./shader/envmap_frag.glsl");
-  Shader irradianceShader("./shader/envmap_vert.glsl", "./shader/envmap_frag.glsl");
+  Shader irradianceShader("./shader/irradiance_vert.glsl", "./shader/irradiance_frag.glsl");
 
   PlaneGeometry groundGeometry(10.0, 10.0);            // 地面
   BoxGeometry boxGeometry(5.0, 5.0, 5.0);              // 盒子
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  unsigned int hdrMap = loadHdrTexture("./static/texture/Alexs_Apt_2k.hdr");
+  unsigned int hdrMap = loadHdrTexture("./static/texture/Ditch-River_2k.hdr");
   cubemapShader.use();
   cubemapShader.setInt("equireMap", 0);
 
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
   glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
   for (unsigned int i = 0; i < 6; ++i)
   {
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 2, 2, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
   }
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 
   glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
   glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 2, 2);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
   glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
-  glViewport(0, 0, 2, 2);
+  glViewport(0, 0, 32, 32);
   glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 
   glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
@@ -356,8 +356,8 @@ int main(int argc, char *argv[])
     envmapShader.setMat4("view", view);
     envmapShader.setMat4("projection", projection);
     glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // 显示生成的辐照度图
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // 显示生成的辐照度图
     drawMesh(boxGeometry);
     // -------------------
 

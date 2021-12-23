@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   Shader lightObjShader("./shader/light_object_vert.glsl", "./shader/light_object_frag.glsl");
   Shader cubemapShader("./shader/cubemap_vert.glsl", "./shader/cubemap_frag.glsl");
   Shader envmapShader("./shader/envmap_vert.glsl", "./shader/envmap_frag.glsl");
-  Shader irradianceShader("./shader/envmap_vert.glsl", "./shader/envmap_frag.glsl");
+  Shader irradianceShader("./shader/irradiance_vert.glsl", "./shader/irradiance_frag.glsl");
 
   Shader prefilterShader("./shader/prefilter_vert.glsl", "./shader/prefilter_frag.glsl");
   Shader brdfShader("./shader/brdf_vert.glsl", "./shader/brdf_frag.glsl");

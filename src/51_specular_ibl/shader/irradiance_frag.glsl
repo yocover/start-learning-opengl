@@ -4,6 +4,8 @@ layout(location = 0) out vec4 FragColor;
 in vec3 worldPos;
 uniform samplerCube envMap;
 
+const float PI = 3.14159265359;
+
 void main() {
 
   vec3 N = normalize(worldPos);
