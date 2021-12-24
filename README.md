@@ -10,7 +10,7 @@
             学习示例 --> IDE:vscode
         </span>
     </h4>
-    <h2 align="center">example screenshot</h2>
+    <h2 align="left">示例截图</h2>
     <div align="center">
      <div style="margin: 20px">
             <a
