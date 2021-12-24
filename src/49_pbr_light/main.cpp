@@ -151,17 +151,17 @@ int main(int argc, char *argv[])
   sceneShader.setVec3("albedo", 0.0f, 0.5f, 0.0f);
   sceneShader.setFloat("ao", 1.0f);
 
-  unsigned int albedoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_albedo.png");
-  unsigned int normalMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_normal.png");
-  unsigned int metallicMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_metallic.png");
-  unsigned int roughnessMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_roughness.png");
-  unsigned int aoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_ao.png");
+  // unsigned int albedoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_albedo.png");
+  // unsigned int normalMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_normal.png");
+  // unsigned int metallicMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_metallic.png");
+  // unsigned int roughnessMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_roughness.png");
+  // unsigned int aoMap = loadTexture("./static/texture/solar/TexturesCom_PaintedConcreteFloor_1K_ao.png");
 
-  // unsigned int albedoMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_albedo.png");
-  // unsigned int normalMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_normal.png");
-  // unsigned int roughnessMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_roughness.png");
-  // unsigned int metallicMap = 0;
-  // unsigned int aoMap = 0;
+  unsigned int albedoMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_albedo.png");
+  unsigned int normalMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_normal.png");
+  unsigned int roughnessMap = loadTexture("./static/texture/tiles/TexturesCom_Marble_TilesSquare8_512_roughness.png");
+  unsigned int metallicMap = 0;
+  unsigned int aoMap = 0;
 
   // 设置贴图
   sceneShader.setInt("albedoMap", 0);

@@ -26,10 +26,10 @@ void drawLightObject(Shader shader, BufferGeometry geometry, glm::vec3 position)
 
 std::string Shader::dirName;
 
-// int SCREEN_WIDTH = 800;
-// int SCREEN_HEIGHT = 600;
-int SCREEN_WIDTH = 1600;
-int SCREEN_HEIGHT = 1200;
+int SCREEN_WIDTH = 800;
+int SCREEN_HEIGHT = 600;
+// int SCREEN_WIDTH = 1600;
+// int SCREEN_HEIGHT = 1200;
 
 // camera value
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);

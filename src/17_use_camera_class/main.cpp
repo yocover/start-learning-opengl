@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 
   float fov = 45.0f; // 视锥体的角度
   glm::vec3 view_translate = glm::vec3(0.0, 0.0, -5.0);
-  ImVec4 clear_color = ImVec4(0.2, 0.3, 0.3, 1.0);
+  ImVec4 clear_color = ImVec4(25.0 / 255.0, 25.0 / 255.0, 25.0 / 255.0, 1.0);
 
   while (!glfwWindowShouldClose(window))
   {
