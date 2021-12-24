@@ -63,7 +63,7 @@
                 href="./src/04_shader_glsl/"
                 title="05_shader_class"
                 ><img
-                    src="./static/images/05_shader_class.png"
+                    src="./static/images/04_shader_glsl_03.png"
                     width="14%"
                     alt="05_shader_class"
             /></a>
