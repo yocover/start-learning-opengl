@@ -68,22 +68,21 @@ void main() {
   vec3 V = normalize(camPos - WorldPos);
   vec3 R = reflect(-V, N); 
 
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+  // 计算法向入射的反射率；如果介电（如塑料）使用 F0 0.04，如果它是金属，使用反照率颜色作为 F0（金属工作流程）  
   vec3 F0 = vec3(0.04);
   F0 = mix(F0, albedo, metallic);
 
-    // reflectance equation
+  // 反射方程
   vec3 Lo = vec3(0.0);
   for(int i = 0; i < 4; ++i) {
-        // calculate per-light radiance
+    // 计算每个光源的辐射
     vec3 L = normalize(lightPositions[i] - WorldPos);
     vec3 H = normalize(V + L);
     float distance = length(lightPositions[i] - WorldPos);
     float attenuation = 1.0 / (distance * distance);
     vec3 radiance = lightColors[i] * attenuation;
 
-        // Cook-Torrance BRDF
+    // Cook-Torrance BRDF
     float NDF = DistributionGGX(N, H, roughness);
     float G = GeometrySmith(N, V, L, roughness);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -92,25 +91,23 @@ void main() {
     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
     vec3 specular = numerator / denominator;
 
-         // kS is equal to Fresnel
+    // kS 等于菲涅尔
     vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
+
+    // 为了保持能量守恒，漫反射和镜面反射不能高于1.0（除非自发光表面）
+    // 所以KD（漫反射分量）等于1.0 - Ks
     vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals 
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
+
+    // 这样只有非金属才有漫反射，或者部分与金属的混合材质，纯金属没有漫反射
     kD *= 1.0 - metallic;	                
 
-        // scale light by NdotL
-    float NdotL = max(dot(N, L), 0.0);        
+    // 通过NdotL缩放
+    float NdotL = max(dot(N, L), 0.0);
 
-        // add to outgoing radiance Lo
-    Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    Lo += (kD * albedo / PI + specular) * radiance * NdotL; // 因为已经将BRDF乘以菲涅尔KS，因此不需要再乘以KS
   }   
 
-    // ambient lighting (we now use IBL as the ambient term)
+  // IBL diffuse部分
   vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
   vec3 kS = F;
@@ -120,7 +117,7 @@ void main() {
   vec3 irradiance = texture(irradianceMap, N).rgb;
   vec3 diffuse = irradiance * albedo;
 
-    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
+  // 对预过滤贴图和BRDF进行采样，并根据Split-Sum近似将他们组合一起 获取IBL镜面反射部分
   const float MAX_REFLECTION_LOD = 4.0;
   vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
   vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
@@ -130,9 +127,9 @@ void main() {
 
   vec3 color = ambient + Lo;
 
-    // HDR tonemapping
+  // HDR 色调映射
   color = color / (color + vec3(1.0));
-    // gamma correct
+  // gamma 校正
   color = pow(color, vec3(1.0 / 2.2));
 
   FragColor = vec4(color, 1.0);

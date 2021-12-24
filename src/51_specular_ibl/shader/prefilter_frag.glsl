@@ -42,13 +42,13 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
   float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a * a - 1.0) * Xi.y));
   float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
 
-	// from spherical coordinates to cartesian coordinates - halfway vector
+	// 从球面坐标到笛卡尔坐标 - 中间向量
   vec3 H;
   H.x = cos(phi) * sinTheta;
   H.y = sin(phi) * sinTheta;
   H.z = cosTheta;
 
-	// from tangent-space H vector to world-space sample vector
+	// 从切线空间 H 向量到世界空间样本向量
   vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
   vec3 tangent = normalize(cross(up, N));
   vec3 bitangent = cross(N, tangent);
@@ -60,7 +60,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
 void main() {
   vec3 N = normalize(WorldPos);
 
-    // make the simplyfying assumption that V equals R equals the normal 
+  // 做出简单的假设，即 V 等于 R 等于正态
   vec3 R = N;
   vec3 V = R;
 
@@ -69,20 +69,20 @@ void main() {
   float totalWeight = 0.0;
 
   for(uint i = 0u; i < SAMPLE_COUNT; ++i) {
-        // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).
+    // 生成一个偏向于齐方向的样本向量（重要性采样）。
     vec2 Xi = Hammersley(i, SAMPLE_COUNT);
     vec3 H = ImportanceSampleGGX(Xi, N, roughness);
     vec3 L = normalize(2.0 * dot(V, H) * H - V);
 
     float NdotL = max(dot(N, L), 0.0);
     if(NdotL > 0.0) {
-            // sample from the environment's mip level based on roughness/pdf
+      // 基于粗糙度/pdf（概率密度函数）的环境mip级别的样本
       float D = DistributionGGX(N, H, roughness);
       float NdotH = max(dot(N, H), 0.0);
       float HdotV = max(dot(H, V), 0.0);
       float pdf = D * NdotH / (4.0 * HdotV) + 0.0001;
 
-      float resolution = 512.0; // resolution of source cubemap (per face)
+      float resolution = 512.0; // 原立方体每个面的分辨率
       float saTexel = 4.0 * PI / (6.0 * resolution * resolution);
       float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 

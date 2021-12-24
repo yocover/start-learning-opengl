@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
   Shader testBrdfShader("./shader/test_brdf_vert.glsl", "./shader/test_brdf_frag.glsl");
 
-  PlaneGeometry quadGeometry(1.0, 1.0);                // 屏幕四边形
+  PlaneGeometry quadGeometry(2.0, 2.0);                // 屏幕四边形
   BoxGeometry boxGeometry(5.0, 5.0, 5.0);              // 盒子
   SphereGeometry pointLightGeometry(0.17, 64.0, 64.0); // 点光源位置显示
   SphereGeometry objectGeometry(1.0, 64.0, 64.0);      // 圆球
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
   cubemapShader.use();
   cubemapShader.setInt("equireMap", 0);
 
-  // 将等距柱状纹理捕捉到立方体贴图的每个面
+  // 获取立方体贴图的每个面
   glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
   glm::vec3 lookEye = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::mat4 captureViews[] =
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // ---------------------
 
-  // ---------------------使用BRDF生成LUT纹理
+  // ---------------------预处理BRDF
   unsigned int brdfLUTTexture;
   glGenTextures(1, &brdfLUTTexture);
 
@@ -438,19 +438,18 @@ int main(int argc, char *argv[])
     envmapShader.setMat4("view", view);
     envmapShader.setMat4("projection", projection);
     glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     // glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // 显示生成的辐照度图
-    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // 显示生成的预过滤图
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // 显示生成的预过滤图
     drawMesh(boxGeometry);
     // -------------------
 
-    // 渲染 BRDF 贴图
+    // 测试预计算 BRDF 纹理
     // testBrdfShader.use();
     // testBrdfShader.setInt("brdfTexture", 0);
     // glActiveTexture(GL_TEXTURE0);
     // glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-    brdfShader.use();
-    drawMesh(quadGeometry);
+    // drawMesh(quadGeometry);
 
     // 绘制灯光物体
     // --------------------------
