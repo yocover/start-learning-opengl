@@ -149,14 +149,14 @@ int main()
 
     // 渲染指令
     // ...
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(25.0 / 255.0, 25.0 / 255.0, 25.0 / 255.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO); // 不需要每次都绑定，对于当前程序其实只需要绑定一次就可以了
     // glDrawArrays(GL_POINTS, 0, 6);
-    glDrawArrays(GL_LINE_LOOP, 0, 3);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glDrawArrays(GL_LINE_LOOP, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glBindVertexArray(0);
 

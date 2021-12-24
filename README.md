@@ -12,17 +12,119 @@
     </h4>
     <h2 align="center">example screenshot</h2>
     <div align="center">
+     <div style="margin: 20px">
             <a
                 style="margin: 10px"
-                href="./src/01_hello_window/"
-                title="41-Bloom"
+                href="./src/02_hello_triangle/"
+                title="02_hello_triangle"
                 ><img
                     src="./static/images/02_hello_triangle_line.png"
                     width="14%"
-                    alt="41-Bloom"
+                    alt="02_hello_triangle"
             /></a>
+            <a
+                style="margin: 10px"
+                href="./src/02_hello_triangle/"
+                title="02_hello_triangle"
+                ><img
+                    src="./static/images/02_hello_triangle.png"
+                    width="14%"
+                    alt="02_hello_triangle"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/03_hello_triangle_exercise/"
+                title="03_hello_triangle_exercise"
+                ><img
+                    src="./static/images/03_hello_triangle_exercise.png"
+                    width="14%"
+                    alt="03_hello_triangle_exercise"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="04_shader_glsl_01"
+                ><img
+                    src="./static/images/04_shader_glsl_01.png"
+                    width="14%"
+                    alt="04_shader_glsl_01"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="04_shader_glsl_02"
+                ><img
+                    src="./static/images/04_shader_glsl_02.png"
+                    width="14%"
+                    alt="04_shader_glsl_02"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="05_shader_class"
+                ><img
+                    src="./static/images/05_shader_class.png"
+                    width="14%"
+                    alt="05_shader_class"
+            /></a>
+        </div>
+        <div style="margin: 20px">
+            <a
+                style="margin: 10px"
+                href="./src/02_hello_triangle/"
+                title="02_hello_triangle"
+                ><img
+                    src="./static/images/02_hello_triangle_line.png"
+                    width="14%"
+                    alt="02_hello_triangle"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/02_hello_triangle/"
+                title="02_hello_triangle"
+                ><img
+                    src="./static/images/02_hello_triangle.png"
+                    width="14%"
+                    alt="02_hello_triangle"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/03_hello_triangle_exercise/"
+                title="03_hello_triangle_exercise"
+                ><img
+                    src="./static/images/03_hello_triangle_exercise.png"
+                    width="14%"
+                    alt="03_hello_triangle_exercise"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="04_shader_glsl_01"
+                ><img
+                    src="./static/images/04_shader_glsl_01.png"
+                    width="14%"
+                    alt="04_shader_glsl_01"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="04_shader_glsl_02"
+                ><img
+                    src="./static/images/04_shader_glsl_02.png"
+                    width="14%"
+                    alt="04_shader_glsl_02"
+            /></a>
+            <a
+                style="margin: 10px"
+                href="./src/04_shader_glsl/"
+                title="05_shader_class"
+                ><img
+                    src="./static/images/05_shader_class.png"
+                    width="14%"
+                    alt="05_shader_class"
+            /></a>
+        </div>
     </div>
-
 </div>
 
 <div>
