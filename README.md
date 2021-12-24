@@ -14,7 +14,7 @@
     <div align="center">
             <a
                 style="margin: 10px"
-                href="./src/01_hello_window/readme.md"
+                href="./src/01_hello_window/"
                 title="41-Bloom"
                 ><img
                     src="./static/images/02_hello_triangle_line.png"
