@@ -1,8 +1,36 @@
-# opengl-vscode-win-env
+<div
+    style="width: auto; text-align: center; margin: 0 auto; padding: 0"
+>
+    <h1 align="center">start-learning-opengl</h1>
+    <h4 align="center">
+        <span>
+            <a href="https://learnopengl-cn.github.io/"
+                >learnopengl-cn</a
+            >
+            学习示例 --> IDE:vscode
+        </span>
+    </h4>
+    <h2 align="center">example screenshot</h2>
+    <div align="center">
+            <a
+                style="margin: 10px"
+                href="./src/01_hello_window/readme.md"
+                title="41-Bloom"
+                ><img
+                    src="./static/images/02_hello_triangle_line.png"
+                    width="14%"
+                    alt="41-Bloom"
+            /></a>
+    </div>
 
-windows 下 vscode 配置 OpenGL 开发环境
+</div>
 
-## 信息
+<div>
+    <h1 align="center"> windows 下 vscode 配置 OpenGL 开发环境
+    </h1>
+</div>
+
+## 参考
 
 -   windows 需安装 MinGW, install gcc、g++、gdb 和 mingw32-make 并 进入到 `MinGW\bin` 文件夹下 把 mingw32-make.exe 修改成 make.exe
 
@@ -32,105 +60,7 @@ windows 下 vscode 配置 OpenGL 开发环境
     ```
 -   assimp 下载已编译好的文件 [Assimp3-1-1_MinGW4-8-1_Win32.zip](https://www.mediafire.com/file/jjiv41rv8euy3dt/Assimp3-1-1_MinGW4-8-1_Win32.zip/file)
 
--   Makefile
-
-    ```mk
-    #
-    # 'make'        build executable file 'main'
-    # 'make clean'  removes all .o and executable files
-    #
-
-    # define the Cpp compiler to use
-    CXX = g++
-
-    # define any compile-time flags
-    CXXFLAGS	:= -std=c++17 -Wall -Wextra -g
-
-    # define library paths in addition to /usr/lib
-    #   if I wanted to include libraries not in /usr/lib I'd specify
-    #   their path using -Lpath, something like:
-    LFLAGS =
-
-    # define output directory
-    OUTPUT	:= output
-
-    # define source directory 运行时修改此处路径
-    SRC		:= src/$(dir) #// 传递 var 变量定义执行文件目录
-    CLEAN_SRC		:= src\$(dir)\*.o #// 删除所有.o文件
-
-    # define include directory
-    INCLUDE	:= include
-
-    # define lib directory
-    LIB		:= lib
-    LIBRARIES	:= -lglad -lglfw3dll -llibassimp
-
-    ifeq ($(OS),Windows_NT)
-    MAIN	:= main.exe
-    SOURCEDIRS	:= $(SRC)
-    INCLUDEDIRS	:= $(INCLUDE)
-    LIBDIRS		:= $(LIB)
-    FIXPATH = $(subst /,/,$1)
-    RM			:= del /q a/f
-    MD	:= mkdir
-    else
-    MAIN	:= main
-    SOURCEDIRS	:= $(shell find $(SRC) -type d)
-    INCLUDEDIRS	:= $(shell find $(INCLUDE) -type d)
-    LIBDIRS		:= $(shell find $(LIB) -type d)
-    FIXPATH = $1
-    RM = rm -f
-    MD	:= mkdir -p
-    endif
-
-    # define any directories containing header files other than /usr/include
-    INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
-
-    # define the C libs
-    LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
-
-    # define the C source files
-    SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))
-    SOURCES	+= include/imgui/imgui_impl_glfw.cpp include/imgui/imgui_impl_opengl3.cpp
-    SOURCES	+= include/imgui/imgui.cpp include/imgui/imgui_demo.cpp include/imgui/imgui_draw.cpp include/imgui/imgui_widgets.cpp
-
-    # define the C object files
-    OBJECTS		:= $(SOURCES:.cpp=.o)
-
-    #
-    # The following part of the makefile is generic; it can be used to
-    # build any executable just by changing the definitions above and by
-    # deleting dependencies appended to the file from 'make depend'
-    #
-
-    OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)\$(MAIN))
-
-    all: $(OUTPUT) $(MAIN)
-      @echo Executing 'all' complete!
-
-    $(OUTPUT):
-      $(MD) $(OUTPUT)
-
-    $(MAIN): $(OBJECTS)
-      $(CXX) $(CXXFLAGS) $(INCLUDES) -o $(OUTPUTMAIN) $(OBJECTS) $(LFLAGS) $(LIBS) $(LIBRARIES)
-
-    # this is a suffix replacement rule for building .o's from .c's
-    # it uses automatic variables $<: the name of the prerequisite of
-    # the rule(a .c file) and $@: the name of the target of the rule (a .o file)
-    # (see the gnu make manual section about automatic variables)
-    .cpp.o:
-      $(CXX) $(CXXFLAGS) $(INCLUDES) -c $<  -o $@
-
-    .PHONY: clean
-    clean:
-      $(RM) $(OUTPUTMAIN)
-      $(RM) $(call FIXPATH,$(CLEAN_SRC))
-      @echo Cleanup complete!
-    # 此处./src/$(dir) 传递main函数 argv 的参数
-    run: all
-      .\$(OUTPUTMAIN) src/$(dir)/
-      @echo Executing 'run: all' complete!
-    ```
+-   [参考 Makefile 文件](https://github.com/yocover/start-learning-opengl/blob/main/Makefile)
 
 ## 示例
 
