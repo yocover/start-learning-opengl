@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  unsigned int hdrMap = loadHdrTexture("./static/texture/Ditch-River_2k.hdr");
+  unsigned int hdrMap = loadHdrTexture("./static/texture/Alexs_Apt_2k.hdr");
   cubemapShader.use();
   cubemapShader.setInt("equireMap", 0);
 

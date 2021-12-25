@@ -19,7 +19,7 @@ void main() {
 
   vec3 ambient = strength * color; // 环境光
 
-  // vec3 normal = normalize(oNormal);
+  //vec3 normal = normalize(oNormal);
   // 从法线贴图获取[0,1]范围的法线值
   vec3 normal = texture(normalMap, oTexCoord).rgb;
   // 将法线向量转换到[-1，1]范围
