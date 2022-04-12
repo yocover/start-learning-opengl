@@ -536,6 +536,7 @@
 -   glfw 下载 [`Windows pre-compiled binaries`](https://www.glfw.org/download.html)
 
     > 选择**Windows pre-compiled binaries**，因为我们使用的 MinGW 所以选择 [32-bit Windows binaries](https://github.com/glfw/glfw/releases/download/3.3.4/glfw-3.3.4.bin.WIN32.zip)
+    > 对于 Ubuntu，通过 `sudo apt install libglfw3-dev libglfw3` 安装 glfw
 
 -   glad [在线服务](https://glad.dav1d.de/) 生成静态库
     ```
@@ -553,6 +554,7 @@
     SOURCES	+= include/imgui/imgui.cpp include/imgui/imgui_demo.cpp include/imgui/imgui_draw.cpp include/imgui/imgui_widgets.cpp
     ```
 -   assimp 下载已编译好的文件 [Assimp3-1-1_MinGW4-8-1_Win32.zip](https://www.mediafire.com/file/jjiv41rv8euy3dt/Assimp3-1-1_MinGW4-8-1_Win32.zip/file)
+    > 对于 Ubuntu，通过 `sudo apt install libassimp-dev` 安装 assimp
 
 -   [参考 Makefile 文件](https://github.com/yocover/start-learning-opengl/blob/main/Makefile)
 
